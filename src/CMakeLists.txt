@@ -1,0 +1,16 @@
+project(game_of_life)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++")
+if(UINX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DISUNIX")
+endif()
+set(SOURCE_FILES
+        main.cpp
+        window_processor.cpp window_processor.h
+        game_of_life.cpp game_of_life.h
+        ui.cpp ui.h
+        )
+
+add_executable(game_of_life ${SOURCE_FILES})
+
+target_link_libraries(game_of_life sfml-graphics sfml-system sfml-window)
