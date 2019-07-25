@@ -20,7 +20,7 @@ namespace ui {
     public:
         explicit UIElement(posType x = 0, posType y = 0, sizeType _width = 0, sizeType _height = 0):
                 xPos(x),yPos(y),width(_width),height(_height){}
-        bool onPosiion(posType cursorX, posType cursorY)const;
+        bool onPosition(posType cursorX, posType cursorY)const;
         virtual void updateContent() = 0;
         std::pair<posType,posType> getXYposition()const{return {xPos, yPos};};
         std::pair<sizeType,sizeType> getWHSize()const{return {width, height};};
@@ -75,17 +75,14 @@ namespace ui {
         void clicked(posType cursorX, posType cursorY);
         void cursorOn(posType cursorX, posType cursorY);
         /* copy function */
-        void addButton(ui::Button& button){
-            renderTexture.draw(button.element);
-            buttons.push_back(&button);
+        void addButton(ui::Button* button){
+            buttons.push_back(button);
              }
-        void addItem(ui::Item& item){
-            renderTexture.draw(item.element);
-            items.push_back(&item);
+        void addItem(ui::Item* item){
+            items.push_back(item);
         }
-
         sf::RenderTexture renderTexture;
-
+        sf::Sprite renderSprite;
     private:
         std::list<ui::Button*> buttons;
         std::list<ui::Item*> items;

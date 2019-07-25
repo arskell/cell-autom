@@ -2,7 +2,7 @@
 #include "ui.h"
 
 
-bool ui::UIElement::onPosiion(posType cursorX, posType cursorY)const {
+bool ui::UIElement::onPosition(posType cursorX, posType cursorY)const {
     if((cursorX >= xPos && cursorX <= xPos+width)&&
        (cursorY >= yPos && cursorY <= yPos+height)){
         return true;
@@ -21,12 +21,16 @@ void ui::Surface::updateContent(){
         renderTexture.draw(e->element);
     }
     renderTexture.display();
+    renderSprite = sf::Sprite(renderTexture.getTexture());
+    renderSprite.setPosition(xPos,yPos);
 }
 
 void ui::Surface::clicked(posType cursorX, posType cursorY) {
-    if(onPosiion(cursorX,cursorY)){
+    auto relCursorX = cursorX - xPos;
+    auto relCursorY = cursorY - yPos;
+    if(onPosition(cursorX,cursorY)){
         for(auto& e:buttons){
-            if(e->onPosiion(cursorX,cursorY)){
+            if(e->onPosition(relCursorX,relCursorY)){
                 e->click();
             }
         }
@@ -34,9 +38,11 @@ void ui::Surface::clicked(posType cursorX, posType cursorY) {
 }
 
 void ui::Surface::cursorOn(posType cursorX, posType cursorY) {
-    if(onPosiion(cursorX,cursorY)){
+    auto relCursorX = cursorX - xPos;
+    auto relCursorY = cursorY - yPos;
+    if(onPosition(cursorX,cursorY)){
         for(auto& e:buttons){
-            if(e->onPosiion(cursorX,cursorY)){
+            if(e->onPosition(relCursorX,relCursorY)){
                 e->cursorOnItem();
             }
         }

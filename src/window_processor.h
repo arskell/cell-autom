@@ -31,6 +31,7 @@ public:
 
     void set_renderWindow(std::unique_ptr<sf::RenderWindow>&& wind){
         renderWindow = std::move(wind);
+        renderbuffer.create(renderWindow->getSize().x, renderWindow->getSize().y);
     }
 
     bool window_is_open() const{
@@ -50,6 +51,7 @@ public:
 private:
     ui::Surface* surface;
     std::function<void(sf::Event&)> keyEventHandler;
+    sf::RenderTexture renderbuffer;
     std::unique_ptr<sf::RenderWindow> renderWindow;
     std::mutex eventHandler_owner;
     std::mutex mtx;

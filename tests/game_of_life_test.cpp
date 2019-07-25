@@ -195,8 +195,8 @@ TEST_CASE("UI elements", "[ui]"){
         testElement.setCursorOnItemHandle([&](){
             ++testButton;
         });
-        testSurface.addButton(testElement);
-        testSurface.addItem(testItem);
+        testSurface.addButton(&testElement);
+        testSurface.addItem(&testItem);
         testSurface.updateContent();
         testSurface.clicked(1,1);
         testSurface.clicked(8,12);

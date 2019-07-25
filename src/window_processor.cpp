@@ -5,16 +5,23 @@ void Window_processor::update_events(){
     std::lock_guard<std::mutex> eventer(eventHandler_owner);
     mtx.lock();
     while(renderWindow->isOpen()) {
-        renderWindow->setActive(false);
-        mtx.unlock(),std::this_thread::sleep_for(UPDATE_DELAY),mtx.lock();
-        renderWindow->setActive(true);
+        mtx.unlock();
+        std::this_thread::sleep_for(UPDATE_DELAY);
+        mtx.lock();
+        renderWindow->clear();
+        renderWindow->draw(sf::Sprite(renderbuffer.getTexture()));
+        if(surface != nullptr) {
+            renderbuffer.draw(surface->renderSprite);
+        }
+        renderbuffer.display();
+        renderWindow->display();
         sf::Event ev;
         if (renderWindow->pollEvent(ev)) {
             switch (ev.type) {
                 case sf::Event::Closed:
                     renderWindow->close();
                     break;
-                case sf::Event::KeyPressed:
+               case sf::Event::KeyPressed:
                     keyEventHandler(ev);
                     break;
                 case sf::Event::MouseButtonPressed:
@@ -33,11 +40,10 @@ void Window_processor::update_events(){
                     break;
             }
         }
-        if(surface != nullptr){
+       if(surface != nullptr){
             surface->updateContent();
         }
     }
-    renderWindow->setActive(false);
     mtx.unlock();
 }
 
@@ -57,9 +63,5 @@ void Window_processor::closeWindow() {
 
 void Window_processor::update(const sf::Sprite& sprt){
     std::lock_guard<std::mutex> lc(mtx);
-    renderWindow->setActive(true);
-    renderWindow->clear();
-    renderWindow->draw(sprt);
-    renderWindow->display();
-    renderWindow->setActive(false);
+    renderbuffer.draw(sprt);
 }
