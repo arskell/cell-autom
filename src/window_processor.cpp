@@ -9,11 +9,11 @@ void Window_processor::update_events(){
         std::this_thread::sleep_for(UPDATE_DELAY);
         mtx.lock();
         renderWindow->clear();
-        renderWindow->draw(sf::Sprite(renderbuffer.getTexture()));
         if(surface != nullptr) {
             renderbuffer.draw(surface->renderSprite);
         }
         renderbuffer.display();
+        renderWindow->draw(sf::Sprite(renderbuffer.getTexture()));
         renderWindow->display();
         sf::Event ev;
         if (renderWindow->pollEvent(ev)) {
