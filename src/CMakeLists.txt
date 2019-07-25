@@ -1,7 +1,5 @@
 project(game_of_life)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++")
-
 set(SOURCE_FILES
         main.cpp
         window_processor.cpp window_processor.h
