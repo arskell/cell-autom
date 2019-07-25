@@ -8,4 +8,4 @@ set(SOURCE_FILES game_of_life_test.cpp
 add_executable(game_of_life_tests ${SOURCE_FILES})
 
 target_link_libraries(game_of_life_tests
-        sfml-graphics-d sfml-system-d sfml-window-d)
+        sfml-graphics sfml-system sfml-window)
