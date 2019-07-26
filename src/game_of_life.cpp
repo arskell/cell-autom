@@ -12,21 +12,18 @@ void game_of_life::Plane::clear() {
     for(planeSize i = 0; i < h; ++i){
         for(planeSize j = 0; j < w; ++j){
             _plane[i][j] = DEAD_CELL;
+            _planeBuffer[i][j] = DEAD_CELL;
         }
     }
 }
 
 void game_of_life::Plane::setState(Point<planeSize> p, bool state) {
+    std::lock_guard<std::mutex> mtx(bufferOwner);
     if(checkRange(p))_plane[p.y][p.x] = state;
 }
 
 void game_of_life::Plane::nextStep() {
-
-    for(planeSize i = 0; i < h; ++i){
-        for(planeSize j = 0; j < w; ++j){
-            _planeBuffer[i][j] = DEAD_CELL;
-        }
-    }
+    std::lock_guard<std::mutex> lc(bufferOwner);
 
     for(planeSize h_pos = 0; h_pos < h; ++h_pos){
         for(planeSize w_pos = 0; w_pos < w; ++w_pos){
@@ -45,10 +42,10 @@ void game_of_life::Plane::nextStep() {
         }
     }
 
-
     for(planeSize i = 0; i < h; ++i){
         for(planeSize j = 0; j < w; ++j){
             _plane[i][j] = _planeBuffer[i][j];
+            _planeBuffer[i][j] = DEAD_CELL;
         }
     }
 }

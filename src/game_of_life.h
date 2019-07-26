@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <mutex>
 #define LIVE_CELL true
 #define DEAD_CELL false
 
@@ -57,6 +58,7 @@ namespace game_of_life {
         planeSize h;
         uint8_t liveCellsNear(Point<planeSize> point);
         bool checkRange(Point<planeSize> point);
+        std::mutex bufferOwner;
     };
 
 }

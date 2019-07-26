@@ -64,7 +64,6 @@ namespace ui {
     protected:
         std::function<void()> clickHandle;
     };
-
     class Surface:   public UIElement{
     public:
         template<typename ...T>
@@ -74,18 +73,25 @@ namespace ui {
         virtual void updateContent() override;
         void clicked(posType cursorX, posType cursorY);
         void cursorOn(posType cursorX, posType cursorY);
-        /* copy function */
         void addButton(ui::Button* button){
             buttons.push_back(button);
              }
         void addItem(ui::Item* item){
             items.push_back(item);
         }
+
+        void addSurf(ui::Surface* srf){
+            child_surf.push_back(srf);
+        }
+
+        bool relToPos(const UIElement* elem, ui::posType x, ui::posType y);
+
         sf::RenderTexture renderTexture;
         sf::Sprite renderSprite;
     private:
         std::list<ui::Button*> buttons;
         std::list<ui::Item*> items;
+        std::list<ui::Surface*> child_surf;
     };
 
 }

@@ -12,6 +12,10 @@ bool ui::UIElement::onPosition(posType cursorX, posType cursorY)const {
 
 void ui::Surface::updateContent(){
     renderTexture.clear();
+    for(auto&e: child_surf){
+        e->updateContent();
+        renderTexture.draw(e->renderSprite);
+    }
     for(auto& e:items){
         e->updateContent();
         renderTexture.draw(e->element);
@@ -34,6 +38,9 @@ void ui::Surface::clicked(posType cursorX, posType cursorY) {
                 e->click();
             }
         }
+        for(auto&e: child_surf){
+            e->clicked(relCursorX,relCursorY);
+        }
     }
 }
 
@@ -46,5 +53,13 @@ void ui::Surface::cursorOn(posType cursorX, posType cursorY) {
                 e->cursorOnItem();
             }
         }
+        for(auto&e: child_surf){
+            e->cursorOn(relCursorX,relCursorY);
+        }
     }
+}
+
+bool ui::Surface::relToPos(const ui::UIElement *elem, ui::posType x, ui::posType y) {
+    if(!onPosition(x, y))return false;
+    return elem->onPosition(x - xPos, y - yPos);
 }

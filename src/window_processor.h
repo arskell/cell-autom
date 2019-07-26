@@ -6,6 +6,7 @@
 #include <memory>
 #include <atomic>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <chrono>
 #include <functional>
@@ -20,7 +21,7 @@
 
 using namespace std::chrono_literals;
 
-#define UPDATE_DELAY 40ms
+#define UPDATE_DELAY 5ms
 
 class Window_processor {
 public:
@@ -47,6 +48,9 @@ public:
     void closeWindow();
     auto getCursorRelToWindow() const{
         return sf::Mouse::getPosition(*renderWindow);
+    }
+    void setWindowTitleSync(const std::string& name){
+        renderWindow->setTitle(name);
     }
 private:
     ui::Surface* surface;
