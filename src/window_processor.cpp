@@ -36,6 +36,16 @@ void Window_processor::update_events(){
                         surface->cursorOn(tmp.x, tmp.y);
                     }
                     break;
+                case sf::Event::MouseWheelScrolled:
+                    if(surface!= nullptr){
+                        auto tmp = this->getCursorRelToWindow();
+                        if(ev.mouseWheelScroll.delta>0){
+                            surface->scrollUp(tmp.x, tmp.y);
+                        }else if(ev.mouseWheelScroll.delta<0){
+                            surface->scrollDown(tmp.x, tmp.y);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }

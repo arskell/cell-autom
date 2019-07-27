@@ -63,3 +63,30 @@ bool ui::Surface::relToPos(const ui::UIElement *elem, ui::posType x, ui::posType
     if(!onPosition(x, y))return false;
     return elem->onPosition(x - xPos, y - yPos);
 }
+
+void ui::Surface::scrollUp(posType cursorX, posType cursorY) {
+    if(relToPos(this, cursorX, cursorY)) {
+        for (auto &e: child_surf) {
+            e->scrollUp(cursorX - xPos, cursorY - yPos);
+        }
+        scrollUpHandle();
+    }
+}
+
+void ui::Surface::scrollDown(posType cursorX, posType cursorY) {
+    if(relToPos(this, cursorX, cursorY)) {
+        for (auto &e: child_surf) {
+            e->scrollDown(cursorX - xPos, cursorY - yPos);
+        }
+        scrollDownHandle();
+    }
+}
+
+void ui::Surface::drag(posType cursorX, posType cursorY) {
+    if(relToPos(this, cursorX, cursorY)) {
+        for (auto &e: child_surf) {
+            e->drag(cursorX - xPos, cursorY - yPos);
+        }
+        dragHandle();
+    }
+}

@@ -69,10 +69,26 @@ namespace ui {
         template<typename ...T>
         Surface(T... UIsettings):UIElement(UIsettings...){
             renderTexture.create(width,height);
+            scrollDownHandle = [](){};
+            scrollUpHandle = [](){};
+            dragHandle = [](){};
+            zoom = 1;
         }
         virtual void updateContent() override;
         void clicked(posType cursorX, posType cursorY);
         void cursorOn(posType cursorX, posType cursorY);
+        void scrollUp(posType cursorX, posType cursorY);
+        void scrollDown(posType cursorX, posType cursorY);
+        void drag(posType cursorX, posType cursorY);
+        void setScrollUpHandle(std::function<void()>&& hndl ){
+            scrollUpHandle = std::forward<decltype(hndl)>(hndl);
+        }
+        void setScrollDownHandle(std::function<void()>&& hndl ){
+            scrollDownHandle = std::forward<decltype(hndl)>(hndl);
+        }
+        void dragUpHandle(std::function<void()>&& hndl ){
+            dragHandle = std::forward<decltype(hndl)>(hndl);
+        }
         void addButton(ui::Button* button){
             buttons.push_back(button);
              }
@@ -84,14 +100,27 @@ namespace ui {
             child_surf.push_back(srf);
         }
 
+        void zoomChange(float d){
+            zoom+=d;
+        }
+
+        void setZoom(float z){
+            zoom = z;
+        }
+
         bool relToPos(const UIElement* elem, ui::posType x, ui::posType y);
 
         sf::RenderTexture renderTexture;
         sf::Sprite renderSprite;
+        sf::View view;
     private:
+        std::function<void()> scrollUpHandle;
+        std::function<void()> scrollDownHandle;
+        std::function<void()> dragHandle;
         std::list<ui::Button*> buttons;
         std::list<ui::Item*> items;
         std::list<ui::Surface*> child_surf;
+        float zoom;
     };
 
 }

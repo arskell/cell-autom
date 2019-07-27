@@ -160,6 +160,14 @@ int main() {
         wp.setWindowTitleSync(Title);
     });
 
+    playGround.setScrollDownHandle([&](){
+       playGround.zoomChange(0.01);
+    });
+
+    playGround.setScrollUpHandle([&](){
+        playGround.zoomChange(-0.01);
+    });
+
     //adding elements on the surface
     panel.addButton(&PAUSEButtom);
     panel.addButton(&DOWNbutton);
