@@ -48,7 +48,8 @@ int main() {
     //setup window manager
     std::promise<void> is_created;
     auto wind = std::async(std::launch::async, [&](){
-        wp.set_renderWindow(std::make_unique<sf::RenderWindow>(sf::VideoMode(width,height), "Game of life"));
+        wp.set_renderWindow(std::make_unique<sf::RenderWindow>(sf::VideoMode(width,height), "Game of life",
+                sf::Style::Close | sf::Style::Titlebar));
         is_created.set_value();
         wp.update_events();
     });
