@@ -84,3 +84,12 @@ bool game_of_life::Plane::checkRange(Point<planeSize> point) {
     if( (point.y < 0)|| (point.y >= h)) return false;
     return true;
 }
+
+void game_of_life::Plane::fill(game_of_life::Point<planeSize> center, uint8_t size, bool state) {
+    center = {center.x - size / 2, center.y - size / 2};
+    for (uint8_t i = 0; i <= size; ++i) {
+        for (uint8_t j = 0; j <= size; ++j) {
+            setState({center.x + i, center.y + j}, state);
+        }
+    }
+}

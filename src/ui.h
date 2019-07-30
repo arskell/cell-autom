@@ -86,7 +86,7 @@ namespace ui {
         void setScrollDownHandle(std::function<void()>&& hndl ){
             scrollDownHandle = std::forward<decltype(hndl)>(hndl);
         }
-        void dragUpHandle(std::function<void()>&& hndl ){
+        void setDragHandle(std::function<void()>&& hndl ){
             dragHandle = std::forward<decltype(hndl)>(hndl);
         }
         void addButton(ui::Button* button){

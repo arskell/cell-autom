@@ -33,7 +33,11 @@ void Window_processor::update_events(){
                 case sf::Event::MouseMoved:
                     if(surface!= nullptr){
                         auto tmp = sf::Mouse::getPosition(*renderWindow);
-                        surface->cursorOn(tmp.x, tmp.y);
+                        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                            surface->drag(tmp.x,tmp.y);
+                        }else {
+                            surface->cursorOn(tmp.x, tmp.y);
+                        }
                     }
                     break;
                 case sf::Event::MouseWheelScrolled:
