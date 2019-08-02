@@ -146,10 +146,10 @@ TEST_CASE("UI elements", "[ui]"){
     ui::Button testElement((ui::posType)3,(ui::posType)10,
                          (ui::sizeType)10,(ui::sizeType) 5);
     SECTION("Cursor position detecting"){
-        REQUIRE_FALSE(testElement.onPosiion(0,0));
-        REQUIRE_FALSE(testElement.onPosiion(4,33));
-        REQUIRE(testElement.onPosiion(8, 12));
-        REQUIRE(testElement.onPosiion(3,10));
+        REQUIRE_FALSE(testElement.onPosition(0,0));
+        REQUIRE_FALSE(testElement.onPosition(4,33));
+        REQUIRE(testElement.onPosition(8, 12));
+        REQUIRE(testElement.onPosition(3,10));
     }
     SECTION("Item update handler"){
         bool testval = false;
