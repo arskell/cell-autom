@@ -64,8 +64,10 @@ int main() {
 
 
     //UP BUTTON
+    sf::Texture speedDownTexture;
+    speedDownTexture.loadFromFile(".\\res\\speedDown.bmp");
     ui::Button UPbutton(10,4,50,50);
-
+    UPbutton.element.setTexture(&speedDownTexture);
     UPbutton.setClickHandle([&](){
        update_rate+=50;
     });
@@ -82,7 +84,10 @@ int main() {
     });
 
     //DOWN BUTTON
+    sf::Texture speedUpTexture;
+    speedUpTexture.loadFromFile(".\\res\\speedUp.bmp");
     ui::Button DOWNbutton(10,4+50+4,50,50);
+    DOWNbutton.element.setTexture(&speedUpTexture);
     DOWNbutton.setClickHandle([&](){
         update_rate-=50;
     });
@@ -99,8 +104,10 @@ int main() {
     });
 
     //PAUSE BUTTON
+    sf::Texture stopTexture;
+    stopTexture.loadFromFile(".\\res\\stop.bmp");
     ui::Button PAUSEButtom(10,4+50+4+50+4,50,50);
-
+    PAUSEButtom.element.setTexture(&stopTexture);
     PAUSEButtom.setClickHandle([&](){
         is_paused = !is_paused;
     });

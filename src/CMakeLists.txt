@@ -8,5 +8,5 @@ set(SOURCE_FILES
         )
 
 add_executable(game_of_life ${SOURCE_FILES})
-
+FILE(COPY res DESTINATION "${CMAKE_BINARY_DIR}\\src")
 target_link_libraries(game_of_life sfml-graphics sfml-system sfml-window)
