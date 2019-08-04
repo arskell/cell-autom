@@ -16,8 +16,9 @@
 
 using namespace std::chrono_literals;
 
-void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture, unsigned int windowWidth, unsigned int windowHeight);
-
+void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture,
+                 unsigned int windowWidth,
+                 unsigned int windowHeight);
 
 
 struct Cursor_setup{
@@ -25,7 +26,7 @@ struct Cursor_setup{
         DRAW,
         ERASE
     }mode;
-    unsigned int cursorSize;
+    unsigned int cursorRadius;
 };
 
 float scale;
@@ -52,8 +53,8 @@ int main() {
     planeTexture.create(width-100,height);
     ui::Surface surf(0,0,width,height);
 
-    std::atomic<unsigned int> update_rate(400);
-    std::string Title = "Game of life, RATE: " + std::to_string(update_rate) + "ms";
+    std::atomic<unsigned int> update_speed(400);
+    std::string Title = "Game of life, UPDATE SPEED: " + std::to_string(update_speed) + "ms";
 
 
     ui::Surface playGround(0,0,700, height);
@@ -69,7 +70,7 @@ int main() {
     ui::Button UPbutton(10,4,50,50);
     UPbutton.element.setTexture(&speedDownTexture);
     UPbutton.setClickHandle([&](){
-       update_rate+=50;
+       update_speed+=50;
     });
 
     UPbutton.element.setFillColor(sf::Color::Red);
@@ -89,7 +90,7 @@ int main() {
     ui::Button DOWNbutton(10,4+50+4,50,50);
     DOWNbutton.element.setTexture(&speedUpTexture);
     DOWNbutton.setClickHandle([&](){
-        update_rate-=50;
+        update_speed-=50;
     });
 
     DOWNbutton.element.setFillColor(sf::Color::Green);
@@ -132,7 +133,7 @@ int main() {
     //setup cursor mode
     Cursor_setup cursor_setup;
     cursor_setup.mode = Cursor_setup::DRAW;
-    cursor_setup.cursorSize = 2;
+    cursor_setup.cursorRadius = 2;
 
 
     SWITCHMODEButton.setClickHandle([&](){
@@ -156,39 +157,34 @@ int main() {
 
 
     //setup game of life plane
-    game_of_life::Plane plane(80*4,60*4);
+    game_of_life::Plane plane(80*0.5,60*0.5);
 
 
     // setting up canvas
     ui::Button UIplane(0,0,700,height);
     UIplane.element.setSize({0,0});
-    UIplane.setClickHandle([&](){
+    auto playGround_Handler = [&](){
         auto cursor = wp.getCursorRelToWindow();
         switch (cursor_setup.mode){
             case Cursor_setup::DRAW:
-                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, LIVE_CELL);
+                if(cursor_setup.cursorRadius > 0)
+                    plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorRadius, LIVE_CELL);
+                else
+                    plane.setState({cursor.x/scale, cursor.y/scale},LIVE_CELL);
                 break;
             case Cursor_setup::ERASE:
-                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, DEAD_CELL);
+                if(cursor_setup.cursorRadius > 0)
+                    plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorRadius, DEAD_CELL);
+                else
+                    plane.setState({cursor.x/scale, cursor.y/scale},DEAD_CELL);
                 break;
             default:
                 break;
         }
-    });
+    };
+    UIplane.setClickHandle(playGround_Handler);
 
-    playGround.setDragHandle([&](){
-        auto cursor = wp.getCursorRelToWindow();
-        switch (cursor_setup.mode){
-            case Cursor_setup::DRAW:
-                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, LIVE_CELL);
-                break;
-            case Cursor_setup::ERASE:
-                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, DEAD_CELL);
-                break;
-            default:
-                break;
-        }
-    });
+    playGround.setDragHandle(playGround_Handler);
 
     std::atomic<bool> to_update(false);
     UIplane.setUpdateHandle([&](){
@@ -199,20 +195,21 @@ int main() {
             renderPlane(plane, &planeTexture, width, height);
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
-        Title = "Game of life, RATE: " +
-                std::to_string(update_rate) +
+        Title = "Game of life, UPDATE SPEED: " +
+                std::to_string(update_speed) +
                 "ms" + (is_paused ? ", PAUSED" : "") +
-                ", CURSOR SIZE: " + std::to_string(cursor_setup.cursorSize)+
+                ", CURSOR RADIUS: " +
+                (cursor_setup.cursorRadius==0?"0.5":std::to_string(cursor_setup.cursorRadius))+
                 ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE");
         wp.setWindowTitleSync(Title);
     });
 
     playGround.setScrollDownHandle([&](){
-       cursor_setup.cursorSize+=1;
+       cursor_setup.cursorRadius+=1;
     });
 
     playGround.setScrollUpHandle([&](){
-        cursor_setup.cursorSize-=1;
+        cursor_setup.cursorRadius-=1;
     });
 
     //adding elements on the surface
@@ -227,7 +224,7 @@ int main() {
 
 
    while(wp.window_is_open()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(update_rate) );
+        std::this_thread::sleep_for(std::chrono::milliseconds(update_speed) );
         if(!is_paused) {
             plane.nextStep();
             to_update = true;
@@ -238,7 +235,9 @@ int main() {
     return 0;
 }
 
-void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture, unsigned int windowWidth, unsigned int windowHeight){
+void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture,
+                 unsigned int windowWidth,
+                 unsigned int windowHeight){
     auto tmp1 = static_cast<float>(windowHeight)/plane.getHeight();
     auto tmp2 = static_cast<float>(windowWidth)/plane.getWidth();
     texture->clear();

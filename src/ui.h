@@ -80,14 +80,14 @@ namespace ui {
         void scrollUp(posType cursorX, posType cursorY);
         void scrollDown(posType cursorX, posType cursorY);
         void drag(posType cursorX, posType cursorY);
-        void setScrollUpHandle(std::function<void()>&& hndl ){
-            scrollUpHandle = std::forward<decltype(hndl)>(hndl);
+        void setScrollUpHandle(std::function<void()> hndl ){
+            scrollUpHandle = hndl;
         }
-        void setScrollDownHandle(std::function<void()>&& hndl ){
-            scrollDownHandle = std::forward<decltype(hndl)>(hndl);
+        void setScrollDownHandle(std::function<void()> hndl ){
+            scrollDownHandle = hndl;
         }
-        void setDragHandle(std::function<void()>&& hndl ){
-            dragHandle = std::forward<decltype(hndl)>(hndl);
+        void setDragHandle(std::function<void()> hndl ){
+            dragHandle = hndl;
         }
         void addButton(ui::Button* button){
             buttons.push_back(button);
