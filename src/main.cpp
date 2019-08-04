@@ -23,7 +23,7 @@ void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture, un
 struct Cursor_setup{
     enum{
         DRAW,
-        ZOOM
+        ERASE
     }mode;
     unsigned int cursorSize;
 };
@@ -123,10 +123,37 @@ int main() {
         }
     });
 
+    sf::Texture switchButton;
+    switchButton.loadFromFile(".\\res\\switchMode.bmp");
+    ui::Button SWITCHMODEButton(10, height-54, 50,50);
+    SWITCHMODEButton.element.setTexture(&switchButton);
+
+
     //setup cursor mode
     Cursor_setup cursor_setup;
     cursor_setup.mode = Cursor_setup::DRAW;
     cursor_setup.cursorSize = 2;
+
+
+    SWITCHMODEButton.setClickHandle([&](){
+       if(cursor_setup.mode == Cursor_setup::DRAW){
+           cursor_setup.mode = Cursor_setup::ERASE;
+       } else{
+           cursor_setup.mode = Cursor_setup::DRAW;
+       }
+    });
+
+    SWITCHMODEButton.element.setFillColor(sf::Color::White);
+    SWITCHMODEButton.setCursorOnItemHandle([&](){
+        SWITCHMODEButton.element.setOutlineThickness(3);
+    });
+    SWITCHMODEButton.setUpdateHandle([&](){
+        auto cursor = wp.getCursorRelToWindow();
+        if(!panel.relToPos(&SWITCHMODEButton, cursor.x, cursor.y) ){
+            SWITCHMODEButton.element.setOutlineThickness(0.f);
+        }
+    });
+
 
     //setup game of life plane
     game_of_life::Plane plane(80*4,60*4);
@@ -141,6 +168,9 @@ int main() {
             case Cursor_setup::DRAW:
                 plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, LIVE_CELL);
                 break;
+            case Cursor_setup::ERASE:
+                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, DEAD_CELL);
+                break;
             default:
                 break;
         }
@@ -148,8 +178,15 @@ int main() {
 
     playGround.setDragHandle([&](){
         auto cursor = wp.getCursorRelToWindow();
-        if (cursor_setup.mode == Cursor_setup::DRAW){
-            plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, LIVE_CELL);
+        switch (cursor_setup.mode){
+            case Cursor_setup::DRAW:
+                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, LIVE_CELL);
+                break;
+            case Cursor_setup::ERASE:
+                plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorSize, DEAD_CELL);
+                break;
+            default:
+                break;
         }
     });
 
@@ -166,7 +203,7 @@ int main() {
                 std::to_string(update_rate) +
                 "ms" + (is_paused ? ", PAUSED" : "") +
                 ", CURSOR SIZE: " + std::to_string(cursor_setup.cursorSize)+
-                ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ZOOM");
+                ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE");
         wp.setWindowTitleSync(Title);
     });
 
@@ -179,6 +216,7 @@ int main() {
     });
 
     //adding elements on the surface
+    panel.addButton(&SWITCHMODEButton);
     panel.addButton(&PAUSEButtom);
     panel.addButton(&DOWNbutton);
     panel.addButton(&UPbutton);
