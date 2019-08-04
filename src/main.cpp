@@ -70,7 +70,7 @@ int main() {
     ui::Button UPbutton(10,4,50,50);
     UPbutton.element.setTexture(&speedDownTexture);
     UPbutton.setClickHandle([&](){
-       update_speed+=50;
+        update_speed+=50;
     });
 
     UPbutton.element.setFillColor(sf::Color::Red);
@@ -90,7 +90,7 @@ int main() {
     ui::Button DOWNbutton(10,4+50+4,50,50);
     DOWNbutton.element.setTexture(&speedUpTexture);
     DOWNbutton.setClickHandle([&](){
-        update_speed-=50;
+        if(update_speed != 0)update_speed-=50;
     });
 
     DOWNbutton.element.setFillColor(sf::Color::Green);
