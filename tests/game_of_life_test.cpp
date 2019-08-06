@@ -3,14 +3,14 @@
 #include <array>
 
 #define private public
-#include "../src/game_of_life.h"
+#include "../src/cell_autom.h"
 #include "../src/ui.h"
 
 TEST_CASE("plane test", "[plane]"){
-    constexpr game_of_life::planeSize testW = 40;
-    constexpr game_of_life::planeSize testH = 60;
+    constexpr cell_autom::planeSize testW = 40;
+    constexpr cell_autom::planeSize testH = 60;
 
-    game_of_life::Plane testPlane(testW, testH);
+    cell_autom::Plane testPlane(testW, testH);
 
     SECTION("Check plane size"){
         REQUIRE(testPlane.getHeight() == testH);
@@ -51,7 +51,7 @@ TEST_CASE("plane test", "[plane]"){
         REQUIRE(testPlane.checkRange({10,10}));
         REQUIRE(testPlane.checkRange({0,0}));
     }
-    std::array<game_of_life::Point<game_of_life::planeSize>, 8> p;
+    std::array<cell_autom::Point<cell_autom::planeSize>, 8> p;
     SECTION("Detect 8 points near"){
         p[0] = {0,0}; p[7] = {1,0}; p[6] = {2,0};
         p[1] = {0,1};               p[5] = {2,1};

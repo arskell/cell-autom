@@ -9,7 +9,7 @@
 #define DEAD_CELL false
 
 
-namespace game_of_life {
+namespace cell_autom {
 
     using planeSize = unsigned int;
 
@@ -47,7 +47,7 @@ namespace game_of_life {
         void setState(Point<planeSize> p, bool state);
         void clear();
         bool operator[](Point<planeSize> p) const;
-        void fill(game_of_life::Point<planeSize> center, uint8_t size, bool state);
+        void fill(cell_autom::Point<planeSize> center, uint8_t size, bool state);
 
         planeSize getWidth()const noexcept { return w;}
         planeSize getHeight()const noexcept { return h;}

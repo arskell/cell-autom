@@ -1,14 +1,14 @@
-#include "game_of_life.h"
+#include "cell_autom.h"
 
-bool game_of_life::Plane::operator[](Point<planeSize> p) const {
+bool cell_autom::Plane::operator[](Point<planeSize> p) const {
     return _plane[p.y][p.x];
 }
 
-void game_of_life::Plane::invert(Point<planeSize> p) {
+void cell_autom::Plane::invert(Point<planeSize> p) {
     _plane[p.y][p.x] = !_plane[p.y][p.x];
 }
 
-void game_of_life::Plane::clear() {
+void cell_autom::Plane::clear() {
     for(planeSize i = 0; i < h; ++i){
         for(planeSize j = 0; j < w; ++j){
             _plane[i][j] = DEAD_CELL;
@@ -17,12 +17,12 @@ void game_of_life::Plane::clear() {
     }
 }
 
-void game_of_life::Plane::setState(Point<planeSize> p, bool state) {
+void cell_autom::Plane::setState(Point<planeSize> p, bool state) {
     std::lock_guard<std::mutex> mtx(bufferOwner);
     if(checkRange(p))_plane[p.y][p.x] = state;
 }
 
-void game_of_life::Plane::nextStep() {
+void cell_autom::Plane::nextStep() {
     std::lock_guard<std::mutex> lc(bufferOwner);
 
     for(planeSize h_pos = 0; h_pos < h; ++h_pos){
@@ -50,7 +50,7 @@ void game_of_life::Plane::nextStep() {
     }
 }
 
-uint8_t game_of_life::Plane::liveCellsNear(Point<planeSize> point) {
+uint8_t cell_autom::Plane::liveCellsNear(Point<planeSize> point) {
     uint8_t result = 0;
     if(checkRange({point.x+1,point.y})){
         result+= static_cast<bool>(_plane[point.y][point.x+1]);
@@ -79,13 +79,13 @@ uint8_t game_of_life::Plane::liveCellsNear(Point<planeSize> point) {
     return result;
 }
 
-bool game_of_life::Plane::checkRange(Point<planeSize> point) {
+bool cell_autom::Plane::checkRange(Point<planeSize> point) {
     if( (point.x < 0)|| (point.x >= w)) return false;
     if( (point.y < 0)|| (point.y >= h)) return false;
     return true;
 }
 
-void game_of_life::Plane::fill(game_of_life::Point<planeSize> center, uint8_t size, bool state) {
+void cell_autom::Plane::fill(cell_autom::Point<planeSize> center, uint8_t size, bool state) {
     center = {center.x - size / 2, center.y - size / 2};
     for (uint8_t i = 0; i <= size; ++i) {
         for (uint8_t j = 0; j <= size; ++j) {

@@ -12,11 +12,11 @@
 #endif
 
 #include "window_processor.h"
-#include "game_of_life.h"
+#include "cell_autom.h"
 
 using namespace std::chrono_literals;
 
-void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture,
+void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
                  unsigned int windowHeight);
 
@@ -157,7 +157,7 @@ int main() {
 
 
     //setup game of life plane
-    game_of_life::Plane plane(80*0.5,60*0.5);
+    cell_autom::Plane plane(80*0.5,60*0.5);
 
 
     // setting up canvas
@@ -235,7 +235,7 @@ int main() {
     return 0;
 }
 
-void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture,
+void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
                  unsigned int windowHeight){
     auto tmp1 = static_cast<float>(windowHeight)/plane.getHeight();
@@ -244,8 +244,8 @@ void renderPlane(const game_of_life::Plane& plane,sf::RenderTexture* texture,
     scale = tmp1>tmp2?tmp2:tmp1;
     sf::RectangleShape elem({scale, scale});
     elem.setFillColor(sf::Color::White);
-    for(game_of_life::planeSize y = 0; y < plane.getHeight(); ++y){
-        for(game_of_life::planeSize x = 0; x < plane.getWidth(); ++x){
+    for(cell_autom::planeSize y = 0; y < plane.getHeight(); ++y){
+        for(cell_autom::planeSize x = 0; x < plane.getWidth(); ++x){
             if(plane[{x,y}]){
                 elem.setPosition(x*scale,y*scale);
                 texture->draw(elem);
