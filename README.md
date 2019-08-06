@@ -1,4 +1,4 @@
-# Conway's game of life
+# Cellular Automata
 
 For compile you only need at least c++14 compiler and sfml. Additional for testing: Catch2.
 
