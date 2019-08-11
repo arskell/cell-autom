@@ -28,6 +28,7 @@ public:
 
     Window_processor(){
         surface = nullptr;
+        keyEventHandler = [](sf::Event&){};
     }
 
     void set_renderWindow(std::unique_ptr<sf::RenderWindow>&& wind){
