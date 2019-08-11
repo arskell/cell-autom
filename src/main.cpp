@@ -285,6 +285,28 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
         recSize-=1;
     sf::RectangleShape elem({recSize, recSize});
     elem.setFillColor(sf::Color::White);
+    sf::RectangleShape vLine({1, scale*plane.getHeight()});
+    sf::RectangleShape hLine({scale*plane.getWidth(), 1});
+
+    vLine.setFillColor(sf::Color(128,128,128));
+    hLine.setFillColor(sf::Color(128,128,128));
+
+    if(render_settings.grid) {
+
+         for (cell_autom::planeSize x = 0; x < plane.getWidth(); ++x) {
+             vLine.setPosition(x * scale - 1, 0);
+             texture->draw(vLine);
+         }
+
+         for (cell_autom::planeSize y = 0; y < plane.getHeight(); ++y) {
+             hLine.setPosition(0, y * scale - 1);
+             texture->draw(hLine);
+         }
+    }
+    vLine.setPosition(scale*plane.getWidth() - 1,0);
+    texture->draw(vLine);
+    hLine.setPosition(0,scale*plane.getHeight());
+    texture->draw(hLine);
     for(cell_autom::planeSize y = 0; y < plane.getHeight(); ++y){
         for(cell_autom::planeSize x = 0; x < plane.getWidth(); ++x){
             if(plane[{x,y}]){
