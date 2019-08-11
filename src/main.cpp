@@ -16,11 +16,6 @@
 
 using namespace std::chrono_literals;
 
-void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
-                 unsigned int windowWidth,
-                 unsigned int windowHeight);
-
-
 struct Cursor_setup{
     enum{
         DRAW,
@@ -29,7 +24,17 @@ struct Cursor_setup{
     unsigned int cursorRadius;
 };
 
-float scale;
+struct Render_settings{
+    bool grid;
+};
+
+
+void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
+                 unsigned int windowWidth,
+                 unsigned int windowHeight,
+                 float& scale,
+                 const Render_settings& render_settings);
+
 
 int main() {
     Window_processor wp;
@@ -128,14 +133,20 @@ int main() {
     switchButton.loadFromFile(".\\res\\switchMode.bmp");
     ui::Button SWITCHMODEButton(10, height-54, 50,50);
     SWITCHMODEButton.element.setTexture(&switchButton);
+    ////////////////
+    //initializing data structures
 
-
+    float scale = 1;
     //setup cursor mode
     Cursor_setup cursor_setup;
     cursor_setup.mode = Cursor_setup::DRAW;
     cursor_setup.cursorRadius = 2;
 
 
+    //setup render settings
+    Render_settings render_settings;
+    render_settings.grid = true;
+    ////////////////
     SWITCHMODEButton.setClickHandle([&](){
        if(cursor_setup.mode == Cursor_setup::DRAW){
            cursor_setup.mode = Cursor_setup::ERASE;
@@ -157,7 +168,7 @@ int main() {
 
 
     //setup game of life plane
-    cell_autom::Plane plane(80*0.5,60*0.5);
+    cell_autom::Plane plane(80*2,60*2);
 
 
     // setting up canvas
@@ -189,10 +200,12 @@ int main() {
     std::atomic<bool> to_update(false);
     UIplane.setUpdateHandle([&](){
         if(to_update){
-            renderPlane(plane, &planeTexture, width, height);
+            renderPlane(plane, &planeTexture, playGround.getWHSize().first ,
+                        playGround.getWHSize().second,scale,render_settings);
             to_update = false;
         }else if(is_paused){
-            renderPlane(plane, &planeTexture, width, height);
+            renderPlane(plane, &planeTexture, playGround.getWHSize().first ,
+                        playGround.getWHSize().second,scale,render_settings);
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
         Title = "Game of life, UPDATE SPEED: " +
@@ -237,12 +250,17 @@ int main() {
 
 void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
-                 unsigned int windowHeight){
+                 unsigned int windowHeight,
+                 float& scale,
+                 const Render_settings& render_settings){
     auto tmp1 = static_cast<float>(windowHeight)/plane.getHeight();
     auto tmp2 = static_cast<float>(windowWidth)/plane.getWidth();
     texture->clear();
     scale = tmp1>tmp2?tmp2:tmp1;
-    sf::RectangleShape elem({scale, scale});
+    auto recSize = scale;
+    if(render_settings.grid)
+        recSize-=1;
+    sf::RectangleShape elem({recSize, recSize});
     elem.setFillColor(sf::Color::White);
     for(cell_autom::planeSize y = 0; y < plane.getHeight(); ++y){
         for(cell_autom::planeSize x = 0; x < plane.getWidth(); ++x){
