@@ -66,8 +66,43 @@ int main() {
     ui::Surface panel(700,0,100,height);
 
     bool is_paused(false);
-    // setting up UI
 
+    ////////////////
+    //initializing data structures
+
+    float scale = 1;
+    //setup cursor mode
+    Cursor_setup cursor_setup;
+    cursor_setup.mode = Cursor_setup::DRAW;
+    cursor_setup.cursorRadius = 2;
+
+
+    //setup render settings
+    Render_settings render_settings;
+    render_settings.grid = true;
+    ////////////////
+
+    // setting up UI
+    //GRID BUTTON
+    sf::Texture switchGridTexture;
+    switchGridTexture.loadFromFile(".\\res\\switchGrid.bmp");
+    ui::Button GRIDButton(10,height-54-54,50,50);
+    GRIDButton.element.setTexture(&switchGridTexture);
+    GRIDButton.element.setFillColor(sf::Color::Cyan);
+    GRIDButton.setClickHandle([&](){
+        render_settings.grid=!render_settings.grid;
+    });
+
+    GRIDButton.element.setFillColor(sf::Color::Red);
+    GRIDButton.setCursorOnItemHandle([&](){
+        GRIDButton.element.setOutlineThickness(3);
+    });
+    GRIDButton.setUpdateHandle([&](){
+        auto cursor = wp.getCursorRelToWindow();
+        if(!panel.relToPos(&GRIDButton, cursor.x, cursor.y) ){
+            GRIDButton.element.setOutlineThickness(0.f);
+        }
+    });
 
     //UP BUTTON
     sf::Texture speedDownTexture;
@@ -128,25 +163,12 @@ int main() {
             PAUSEButtom.element.setOutlineThickness(0.f);
         }
     });
+    //SWITCH CURSOR MODE BUTTON
 
     sf::Texture switchButton;
     switchButton.loadFromFile(".\\res\\switchMode.bmp");
     ui::Button SWITCHMODEButton(10, height-54, 50,50);
     SWITCHMODEButton.element.setTexture(&switchButton);
-    ////////////////
-    //initializing data structures
-
-    float scale = 1;
-    //setup cursor mode
-    Cursor_setup cursor_setup;
-    cursor_setup.mode = Cursor_setup::DRAW;
-    cursor_setup.cursorRadius = 2;
-
-
-    //setup render settings
-    Render_settings render_settings;
-    render_settings.grid = true;
-    ////////////////
     SWITCHMODEButton.setClickHandle([&](){
        if(cursor_setup.mode == Cursor_setup::DRAW){
            cursor_setup.mode = Cursor_setup::ERASE;
@@ -168,7 +190,7 @@ int main() {
 
 
     //setup game of life plane
-    cell_autom::Plane plane(80*2,60*2);
+    cell_autom::Plane plane(80*0.5,60*0.5);
 
 
     // setting up canvas
@@ -226,6 +248,7 @@ int main() {
     });
 
     //adding elements on the surface
+    panel.addButton((&GRIDButton));
     panel.addButton(&SWITCHMODEButton);
     panel.addButton(&PAUSEButtom);
     panel.addButton(&DOWNbutton);
