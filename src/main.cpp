@@ -244,7 +244,8 @@ int main() {
     });
 
     playGround.setScrollUpHandle([&](){
-        cursor_setup.cursorRadius-=1;
+        if(cursor_setup.cursorRadius != 0)
+            cursor_setup.cursorRadius-=1;
     });
 
     //adding elements on the surface
