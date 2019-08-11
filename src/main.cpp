@@ -147,20 +147,20 @@ int main() {
     //PAUSE BUTTON
     sf::Texture stopTexture;
     stopTexture.loadFromFile(".\\res\\stop.bmp");
-    ui::Button PAUSEButtom(10,4+50+4+50+4,50,50);
-    PAUSEButtom.element.setTexture(&stopTexture);
-    PAUSEButtom.setClickHandle([&](){
+    ui::Button PAUSEButton(10,4+50+4+50+4,50,50);
+    PAUSEButton.element.setTexture(&stopTexture);
+    PAUSEButton.setClickHandle([&](){
         is_paused = !is_paused;
     });
 
-    PAUSEButtom.element.setFillColor(sf::Color::White);
-    PAUSEButtom.setCursorOnItemHandle([&](){
-        PAUSEButtom.element.setOutlineThickness(3);
+    PAUSEButton.element.setFillColor(sf::Color::White);
+    PAUSEButton.setCursorOnItemHandle([&](){
+        PAUSEButton.element.setOutlineThickness(3);
     });
-    PAUSEButtom.setUpdateHandle([&](){
+    PAUSEButton.setUpdateHandle([&](){
         auto cursor = wp.getCursorRelToWindow();
-        if(!panel.relToPos(&PAUSEButtom, cursor.x, cursor.y) ){
-            PAUSEButtom.element.setOutlineThickness(0.f);
+        if(!panel.relToPos(&PAUSEButton, cursor.x, cursor.y) ){
+            PAUSEButton.element.setOutlineThickness(0.f);
         }
     });
     //SWITCH CURSOR MODE BUTTON
@@ -250,7 +250,7 @@ int main() {
     //adding elements on the surface
     panel.addButton((&GRIDButton));
     panel.addButton(&SWITCHMODEButton);
-    panel.addButton(&PAUSEButtom);
+    panel.addButton(&PAUSEButton);
     panel.addButton(&DOWNbutton);
     panel.addButton(&UPbutton);
     playGround.addButton(&UIplane);
