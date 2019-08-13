@@ -4,6 +4,7 @@
 #include <iostream>
 #include <atomic>
 #include <string>
+#include <cmath>
 
 #ifdef ISUNIX
 #include <SFML/Graphics.hpp>
@@ -201,8 +202,8 @@ int main() {
     UIplane.element.setSize({0,0});
     auto playGround_Handler = [&](){
         auto cursor = wp.getCursorRelToWindow();
-        auto cursorXSc = render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale + cursor.x/scale;
-        auto cursorYSc = render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale + cursor.y/scale;
+        auto cursorXSc = render_settings.center.x - ceil((plane.getWidth()/2.0)*render_settings.zoomScale) + cursor.x/scale;
+        auto cursorYSc = render_settings.center.y - ceil((plane.getHeight()/2.0)*render_settings.zoomScale) + cursor.y/scale;
         switch (cursor_setup.mode){
             case Cursor_setup::DRAW:
                 if(cursor_setup.cursorRadius > 0)
@@ -235,12 +236,13 @@ int main() {
                         playGround.getWHSize().second,scale,render_settings);
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
-        Title = "Game of life, UPDATE SPEED: " +
+        Title = "Game of life, UPD. SPEED: " +
                 std::to_string(update_speed) +
                 "ms" + (is_paused ? ", PAUSED" : "") +
-                ", CURSOR RADIUS: " +
+                ", C. RADIUS: " +
                 (cursor_setup.cursorRadius==0?"0.5":std::to_string(cursor_setup.cursorRadius))+
-                ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE");
+                ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE")+", ZOOM: "+
+                std::to_string(render_settings.zoomScale);
         wp.setWindowTitleSync(Title);
     });
 
@@ -273,13 +275,13 @@ int main() {
         switch (ev.key.code){
             case sf::Keyboard::Key::Z:
                 if(render_settings.zoomScale > 0.01) {
-                    render_settings.zoomScale -= 0.1;
+                    render_settings.zoomScale -= 0.15;
                     render_settings.zoom_UPD = true;
                 }
                 break;
             case sf::Keyboard::Key::X:
                 if(render_settings.zoomScale < 1.0) {
-                    render_settings.zoomScale += 0.1;
+                    render_settings.zoomScale += 0.15;
                     render_settings.zoom_UPD = true;
                 }
                 break;
