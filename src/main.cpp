@@ -26,6 +26,9 @@ struct Cursor_setup{
 
 struct Render_settings{
     bool grid;
+    cell_autom::Point<cell_autom::planeSize> center;
+    float zoomScale;
+    bool zoom_UPD;
 };
 
 
@@ -33,7 +36,7 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
                  unsigned int windowHeight,
                  float& scale,
-                 const Render_settings& render_settings);
+                 Render_settings& render_settings);
 
 
 int main() {
@@ -51,7 +54,6 @@ int main() {
         wp.update_events();
     });
 
-    is_created.get_future().wait(); /*   wait until window init    */
 
     sf::RenderTexture planeTexture;
 
@@ -74,12 +76,13 @@ int main() {
     //setup cursor mode
     Cursor_setup cursor_setup;
     cursor_setup.mode = Cursor_setup::DRAW;
-    cursor_setup.cursorRadius = 2;
+    cursor_setup.cursorRadius = 0;
 
 
     //setup render settings
     Render_settings render_settings;
     render_settings.grid = true;
+
     ////////////////
 
     // setting up UI
@@ -190,7 +193,7 @@ int main() {
 
 
     //setup game of life plane
-    cell_autom::Plane plane(80*0.5,60*0.5);
+    cell_autom::Plane plane(70,60);
 
 
     // setting up canvas
@@ -198,18 +201,20 @@ int main() {
     UIplane.element.setSize({0,0});
     auto playGround_Handler = [&](){
         auto cursor = wp.getCursorRelToWindow();
+        auto cursorXSc = render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale + cursor.x/scale;
+        auto cursorYSc = render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale + cursor.y/scale;
         switch (cursor_setup.mode){
             case Cursor_setup::DRAW:
                 if(cursor_setup.cursorRadius > 0)
-                    plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorRadius, LIVE_CELL);
+                    plane.fill({cursorXSc,cursorYSc}, cursor_setup.cursorRadius, LIVE_CELL);
                 else
-                    plane.setState({cursor.x/scale, cursor.y/scale},LIVE_CELL);
+                    plane.setState({cursorXSc, cursorYSc},LIVE_CELL);
                 break;
             case Cursor_setup::ERASE:
                 if(cursor_setup.cursorRadius > 0)
-                    plane.fill({cursor.x/scale, cursor.y/scale}, cursor_setup.cursorRadius, DEAD_CELL);
+                    plane.fill({cursorXSc, cursorYSc}, cursor_setup.cursorRadius, DEAD_CELL);
                 else
-                    plane.setState({cursor.x/scale, cursor.y/scale},DEAD_CELL);
+                    plane.setState({cursorXSc, cursorYSc},DEAD_CELL);
                 break;
             default:
                 break;
@@ -240,12 +245,12 @@ int main() {
     });
 
     playGround.setScrollDownHandle([&](){
-       cursor_setup.cursorRadius+=1;
+        if(cursor_setup.cursorRadius != 0)
+            cursor_setup.cursorRadius-=1;
     });
 
     playGround.setScrollUpHandle([&](){
-        if(cursor_setup.cursorRadius != 0)
-            cursor_setup.cursorRadius-=1;
+            cursor_setup.cursorRadius+=1;
     });
 
     //adding elements on the surface
@@ -257,8 +262,51 @@ int main() {
     playGround.addButton(&UIplane);
     surf.addSurf(&panel);
     surf.addSurf(&playGround);
-    wp.setSurface(&surf);
 
+    //setup render settings
+    render_settings.center.x = plane.getWidth()/2;
+    render_settings.center.y = plane.getHeight()/2;
+    render_settings.zoomScale = 1;
+    render_settings.zoom_UPD = true;
+    //setup keys
+    wp.setKeyEventHandler([&](sf::Event& ev){
+        switch (ev.key.code){
+            case sf::Keyboard::Key::Z:
+                if(render_settings.zoomScale > 0.01) {
+                    render_settings.zoomScale -= 0.1;
+                    render_settings.zoom_UPD = true;
+                }
+                break;
+            case sf::Keyboard::Key::X:
+                if(render_settings.zoomScale < 1.0) {
+                    render_settings.zoomScale += 0.1;
+                    render_settings.zoom_UPD = true;
+                }
+                break;
+            case sf::Keyboard::Key::Up:
+                if(render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale > 0)
+                    --render_settings.center.y;
+                break;
+            case sf::Keyboard::Key::Down:
+                if(render_settings.center.y + (plane.getHeight()/2.0)*render_settings.zoomScale < plane.getHeight() - 1)
+                    ++render_settings.center.y;
+                break;
+            case sf::Keyboard::Key::Right:
+                if(render_settings.center.x + (plane.getWidth()/2.0)*render_settings.zoomScale < plane.getWidth() - 1)
+                    ++render_settings.center.x;
+                break;
+            case sf::Keyboard::Key::Left:
+                if(render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale > 0)
+                    --render_settings.center.x;
+                break;
+            default:
+                break;
+    }
+    });
+    /*   wait until window init    */
+    is_created.get_future().wait();
+    //setup surface on RenderWindow
+    wp.setSurface(&surf);
 
    while(wp.window_is_open()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(update_speed) );
@@ -276,9 +324,53 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
                  unsigned int windowHeight,
                  float& scale,
-                 const Render_settings& render_settings){
-    auto tmp1 = static_cast<float>(windowHeight)/plane.getHeight();
-    auto tmp2 = static_cast<float>(windowWidth)/plane.getWidth();
+                 Render_settings& render_settings){
+
+    auto planeRenderWidthStart = render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale;
+    auto planeRenderHeightStart = render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale;
+    auto planeRenderWidthEnd = render_settings.center.x + (plane.getWidth()/2.0)*render_settings.zoomScale;
+    auto planeRenderHeightEnd = render_settings.center.y + (plane.getHeight()/2.0)*render_settings.zoomScale;
+
+    if(render_settings.zoom_UPD) {
+        render_settings.zoom_UPD = false;
+        bool in_bounds[4] = {false, false, false, false};
+        while (!(in_bounds[0] && in_bounds[1] && in_bounds[2] && in_bounds[3])) {
+            if (planeRenderWidthStart >= 0) {
+                in_bounds[0] = true;
+            }
+            if (planeRenderHeightStart >= 0) {
+                in_bounds[1] = true;
+            }
+            if (planeRenderWidthEnd <= plane.getWidth()) {
+                in_bounds[2] = true;
+            }
+            if (planeRenderHeightEnd <= plane.getHeight()) {
+                in_bounds[3] = true;
+            }
+
+            if (!(in_bounds[0] && in_bounds[1] && in_bounds[2] && in_bounds[3])) {
+                if (!in_bounds[0]) {
+                    ++render_settings.center.x;
+                }
+                if (!in_bounds[1]) {
+                    ++render_settings.center.y;
+                }
+                if (!in_bounds[2]) {
+                    --render_settings.center.x;
+                }
+                if (!in_bounds[3]) {
+                    --render_settings.center.y;
+                }
+                planeRenderWidthStart = render_settings.center.x - (plane.getWidth() / 2.0) * render_settings.zoomScale;
+                planeRenderHeightStart =
+                        render_settings.center.y - (plane.getHeight() / 2.0) * render_settings.zoomScale;
+                planeRenderWidthEnd = render_settings.center.x + (plane.getWidth() / 2.0) * render_settings.zoomScale;
+                planeRenderHeightEnd = render_settings.center.y + (plane.getHeight() / 2.0) * render_settings.zoomScale;
+            }
+        }
+    }
+    auto tmp1 = static_cast<float>(windowHeight)/(planeRenderHeightEnd-planeRenderHeightStart);
+    auto tmp2 = static_cast<float>(windowWidth)/(planeRenderWidthEnd-planeRenderWidthStart);
     texture->clear();
     scale = tmp1>tmp2?tmp2:tmp1;
     auto recSize = scale;
@@ -286,8 +378,8 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
         recSize-=1;
     sf::RectangleShape elem({recSize, recSize});
     elem.setFillColor(sf::Color::White);
-    sf::RectangleShape vLine({1, scale*plane.getHeight()});
-    sf::RectangleShape hLine({scale*plane.getWidth(), 1});
+    sf::RectangleShape vLine({1, scale*(planeRenderHeightEnd-planeRenderHeightStart)});
+    sf::RectangleShape hLine({scale*(planeRenderWidthEnd-planeRenderWidthStart), 1});
 
     vLine.setFillColor(sf::Color(128,128,128));
     hLine.setFillColor(sf::Color(128,128,128));
@@ -308,10 +400,10 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
     texture->draw(vLine);
     hLine.setPosition(0,scale*plane.getHeight());
     texture->draw(hLine);
-    for(cell_autom::planeSize y = 0; y < plane.getHeight(); ++y){
-        for(cell_autom::planeSize x = 0; x < plane.getWidth(); ++x){
+    for(cell_autom::planeSize y(planeRenderHeightStart),_y(0); y < planeRenderHeightEnd; ++y, ++_y){
+        for(cell_autom::planeSize x(planeRenderWidthStart), _x(0); x < planeRenderWidthEnd; ++x, ++_x){
             if(plane[{x,y}]){
-                elem.setPosition(x*scale,y*scale);
+                elem.setPosition((_x)*scale,(_y)*scale);
                 texture->draw(elem);
             }
         }
