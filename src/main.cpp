@@ -1,8 +1,8 @@
 #include <thread>
 #include <future>
+#include <mutex>
 #include <chrono>
 #include <iostream>
-#include <atomic>
 #include <string>
 #include <cmath>
 
@@ -72,7 +72,7 @@ int main() {
 
     ////////////////
     //initializing data structures
-
+    std::mutex plane_is_busy;
     float scale = 1;
     //setup cursor mode
     Cursor_setup cursor_setup;
@@ -225,15 +225,11 @@ int main() {
 
     playGround.setDragHandle(playGround_Handler);
 
-    std::atomic<bool> to_update(false);
     UIplane.setUpdateHandle([&](){
-        if(to_update){
+        if(plane_is_busy.try_lock()){
             renderPlane(plane, &planeTexture, playGround.getWHSize().first ,
                         playGround.getWHSize().second,scale,render_settings);
-            to_update = false;
-        }else if(is_paused){
-            renderPlane(plane, &planeTexture, playGround.getWHSize().first ,
-                        playGround.getWHSize().second,scale,render_settings);
+            plane_is_busy.unlock();
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
         Title = "Game of life, UPD. SPEED: " +
@@ -313,8 +309,9 @@ int main() {
    while(wp.window_is_open()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(update_speed) );
         if(!is_paused) {
+            plane_is_busy.lock();
             plane.nextStep();
-            to_update = true;
+            plane_is_busy.unlock();
         }
     }
 
