@@ -270,14 +270,12 @@ int main() {
     wp.setKeyEventHandler([&](sf::Event& ev){
         switch (ev.key.code){
             case sf::Keyboard::Key::Z:
-                if(render_settings.zoomScale > 0.01) {
-                    render_settings.zoomScale -= 0.15;
-                    render_settings.zoom_UPD = true;
-                }
+                render_settings.zoomScale *= 0.5;
+                render_settings.zoom_UPD = true;
                 break;
             case sf::Keyboard::Key::X:
                 if(render_settings.zoomScale < 1.0) {
-                    render_settings.zoomScale += 0.15;
+                    render_settings.zoomScale /= 0.5;
                     render_settings.zoom_UPD = true;
                 }
                 break;
