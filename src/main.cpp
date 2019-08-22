@@ -6,11 +6,9 @@
 #include <string>
 #include <cmath>
 
-#ifdef ISUNIX
+
 #include <SFML/Graphics.hpp>
-#else
-#include <SFML/graphics.hpp>
-#endif
+
 
 #include "window_processor.h"
 #include "cell_autom.h"

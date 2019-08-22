@@ -11,11 +11,7 @@
 #include <chrono>
 #include <functional>
 
-#ifdef ISUNIX
 #include <SFML/Graphics.hpp>
-#else
-#include <SFML/graphics.hpp>
-#endif
 
 #include "ui.h"
 

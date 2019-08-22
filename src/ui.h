@@ -6,11 +6,8 @@
 #include <list>
 #include <functional>
 
-#ifdef ISUNIX
 #include <SFML/Graphics.hpp>
-#else
-#include <SFML/graphics.hpp>
-#endif
+
 
 namespace ui {
     using posType  = unsigned int;
