@@ -9,9 +9,9 @@ Catch2(for testing)
 
 `git clone https://github.com/arskell/cell-autom`  
 `mkdir build`  
-`cd build`  
+`cd ./build`  
 `cmake .. -G"MinGW Makefiles"`  
-`cd src`  
+`cd ./src`  
 `make`  
   
 #### Controls
