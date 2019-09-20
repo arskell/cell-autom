@@ -242,13 +242,7 @@ int main() {
             plane_is_busy.unlock();
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
-        Title = "Game of life, UPD. SPEED: " +
-                std::to_string(update_speed) +
-                "ms" + (is_paused ? ", PAUSED" : "") +
-                ", C. RADIUS: " +
-                (cursor_setup.cursorRadius==0?"0.5":std::to_string(cursor_setup.cursorRadius))+
-                ", MODE: "+ (cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE")+", ZOOM: "+
-                std::to_string(render_settings.zoomScale);
+        Title = "Game of life" + std::string((is_paused ? ", PAUSED" : ""));
         wp.setWindowTitleSync(Title);
     });
 
@@ -261,12 +255,60 @@ int main() {
             cursor_setup.cursorRadius+=1;
     });
 
+    sf::Font fnt;
+    fnt.loadFromFile(".\\res\\ArialRegular.ttf");
+    //adding text
+
+
+    ui::Surface info_panel(4,200,100,150);
+    ui::Text speed_txt(0,0,0,11);
+    speed_txt.text.setFont(fnt);
+    speed_txt.text.setString("speed: ");
+    speed_txt.setUpdateHandle([&](){
+        speed_txt.text.setString("speed: " + std::to_string(update_speed) + "ms");
+    });
+
+    ui::Text radius_txt(0,15,0,11);
+    radius_txt.text.setFont(fnt);
+    radius_txt.text.setString("radius: ");
+    radius_txt.setUpdateHandle([&](){
+        radius_txt.text.setString("radius: " + (cursor_setup.cursorRadius==0?"0.5":std::to_string(cursor_setup.cursorRadius)));
+    });
+
+    ui::Text size_txt(0,30,0,11);
+    size_txt.text.setFont(fnt);
+    size_txt.text.setString("size: ");
+    size_txt.setUpdateHandle([&](){
+        size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
+    });
+
+    ui::Text mode_txt(0,45,0,11);
+    mode_txt.text.setFont(fnt);
+    mode_txt.text.setString("mode: ");
+    mode_txt.setUpdateHandle([&](){
+        mode_txt.text.setString("mode: " + std::string((cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE")));
+    });
+
+    ui::Text zooming_txt(0,60,0,11);
+    zooming_txt.text.setFont(fnt);
+    zooming_txt.text.setString("zoom: ");
+    zooming_txt.setUpdateHandle([&](){
+        zooming_txt.text.setString("zoom: " + std::to_string(render_settings.zoomScale));
+    });
+
+    info_panel.addTextItem(&speed_txt);
+    info_panel.addTextItem(&radius_txt);
+    info_panel.addTextItem(&size_txt);
+    info_panel.addTextItem(&mode_txt);
+    info_panel.addTextItem(&zooming_txt);
+
     //adding elements on the surface
     panel.addButton((&GRIDButton));
     panel.addButton(&SWITCHMODEButton);
     panel.addButton(&PAUSEButton);
     panel.addButton(&DOWNbutton);
     panel.addButton(&UPbutton);
+    panel.addSurf(&info_panel);
     playGround.addButton(&UIplane);
     surf.addSurf(&panel);
     surf.addSurf(&playGround);

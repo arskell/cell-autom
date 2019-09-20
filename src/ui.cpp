@@ -16,13 +16,18 @@ void ui::Surface::updateContent(){
         e->updateContent();
         renderTexture.draw(e->renderSprite);
     }
-    for(auto& e:items){
+    for(auto e:items){
         e->updateContent();
         renderTexture.draw(e->element);
     }
-    for(auto& e:buttons){
+    for(auto e:buttons){
         e->updateContent();
         renderTexture.draw(e->element);
+    }
+
+    for(auto e: text_items){
+        e->updateContent();
+        renderTexture.draw(e->text);
     }
     renderTexture.display();
     renderSprite = sf::Sprite(renderTexture.getTexture());

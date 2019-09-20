@@ -49,6 +49,21 @@ namespace ui {
         std::function<void()> updateHandle;
     };
 
+    class Text:     public UIElement{
+    public:
+        template<typename ...T>
+        Text(T... UIsettings):UIElement(UIsettings...){
+            text.setPosition(xPos, yPos);
+            text.setCharacterSize(height);
+            updateHandle = [](){};
+           //text.setFont(font);
+        }
+        virtual void updateContent() override{updateHandle();}
+        void setUpdateHandle( std::function<void()> hndl){updateHandle = std::move(hndl);}
+        sf::Text text;
+    protected:
+        std::function<void()> updateHandle;
+    };
 
     class Button:   public Item{
     public:
@@ -89,6 +104,9 @@ namespace ui {
         void addButton(ui::Button* button){
             buttons.push_back(button);
              }
+        void addTextItem(ui::Text* txt){
+            text_items.push_back(txt);
+        }
         void addItem(ui::Item* item){
             items.push_back(item);
         }
@@ -115,6 +133,7 @@ namespace ui {
         std::function<void()> scrollDownHandle;
         std::function<void()> dragHandle;
         std::list<ui::Button*> buttons;
+        std::list<ui::Text*> text_items;
         std::list<ui::Item*> items;
         std::list<ui::Surface*> child_surf;
         float zoom;
