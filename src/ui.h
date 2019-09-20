@@ -56,7 +56,6 @@ namespace ui {
             text.setPosition(xPos, yPos);
             text.setCharacterSize(height);
             updateHandle = [](){};
-           //text.setFont(font);
         }
         virtual void updateContent() override{updateHandle();}
         void setUpdateHandle( std::function<void()> hndl){updateHandle = std::move(hndl);}

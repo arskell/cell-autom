@@ -265,35 +265,53 @@ int main() {
     speed_txt.text.setFont(fnt);
     speed_txt.text.setString("speed: ");
     speed_txt.setUpdateHandle([&](){
-        speed_txt.text.setString("speed: " + std::to_string(update_speed) + "ms");
+        static unsigned int  old_update_spd = update_speed + 1;
+        if(old_update_spd !=update_speed) {
+            speed_txt.text.setString("speed: " + std::to_string(update_speed) + "ms");
+            old_update_spd = update_speed;
+        }
     });
 
     ui::Text radius_txt(0,15,0,11);
     radius_txt.text.setFont(fnt);
     radius_txt.text.setString("radius: ");
     radius_txt.setUpdateHandle([&](){
-        radius_txt.text.setString("radius: " + (cursor_setup.cursorRadius==0?"0.5":std::to_string(cursor_setup.cursorRadius)));
+        static decltype(cursor_setup.cursorRadius) old_cursor_rad = cursor_setup.cursorRadius + 1;
+        if(old_cursor_rad != cursor_setup.cursorRadius) {
+            radius_txt.text.setString(
+                    "radius: " + (cursor_setup.cursorRadius == 0 ? "0.5" : std::to_string(cursor_setup.cursorRadius)));
+            old_cursor_rad = cursor_setup.cursorRadius;
+        }
     });
 
     ui::Text size_txt(0,30,0,11);
     size_txt.text.setFont(fnt);
-    size_txt.text.setString("size: ");
-    size_txt.setUpdateHandle([&](){
-        size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
-    });
+    size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
+   // size_txt.setUpdateHandle([&](){
+   //     size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
+   // });
 
     ui::Text mode_txt(0,45,0,11);
     mode_txt.text.setFont(fnt);
     mode_txt.text.setString("mode: ");
     mode_txt.setUpdateHandle([&](){
-        mode_txt.text.setString("mode: " + std::string((cursor_setup.mode==Cursor_setup::DRAW?"DRAW":"ERASE")));
+        static decltype(cursor_setup.mode) old_mode = (cursor_setup.mode==Cursor_setup::DRAW?Cursor_setup::ERASE:Cursor_setup::DRAW);
+        if(old_mode !=cursor_setup.mode) {
+            mode_txt.text.setString(
+                    "mode: " + std::string((cursor_setup.mode == Cursor_setup::DRAW ? "DRAW" : "ERASE")));
+            old_mode= cursor_setup.mode;
+        }
     });
 
     ui::Text zooming_txt(0,60,0,11);
     zooming_txt.text.setFont(fnt);
     zooming_txt.text.setString("zoom: ");
     zooming_txt.setUpdateHandle([&](){
-        zooming_txt.text.setString("zoom: " + std::to_string(render_settings.zoomScale));
+        static decltype(render_settings.zoomScale) old_zoom = render_settings.zoomScale +1;
+        if(old_zoom != render_settings.zoomScale) {
+            zooming_txt.text.setString("zoom: " + std::to_string(render_settings.zoomScale));
+            old_zoom = render_settings.zoomScale;
+        }
     });
 
     info_panel.addTextItem(&speed_txt);
