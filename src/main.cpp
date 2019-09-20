@@ -458,8 +458,8 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
         recSize-=1;
     sf::RectangleShape elem({recSize, recSize});
     elem.setFillColor(sf::Color::White);
-    sf::RectangleShape vLine({1, scale*(planeRenderHeightEnd-planeRenderHeightStart)});
-    sf::RectangleShape hLine({scale*(planeRenderWidthEnd-planeRenderWidthStart), 1});
+    sf::RectangleShape vLine({1, scale*plane.getHeight()});
+    sf::RectangleShape hLine({scale*plane.getWidth(), 1});
 
     vLine.setFillColor(sf::Color(128,128,128));
     hLine.setFillColor(sf::Color(128,128,128));
