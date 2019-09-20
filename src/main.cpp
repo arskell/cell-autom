@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <exception>
+#include <fstream>
 
 #include <SFML/Graphics.hpp>
 
@@ -42,12 +44,22 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  float& scale,
                  Render_settings& render_settings);
 
+struct Settings{
+    cell_autom::planeSize width;
+    cell_autom::planeSize height;
+    std::string rule;
+};
+
+const char default_config[] = "W:70\nH:60\nR:\0";
+Settings get_settings();
 
 int main() {
     Window_processor wp;
 
     constexpr unsigned int width = 800;
     constexpr unsigned int height = 600;
+
+    Settings settings = get_settings();
 
     //setup window manager
     std::promise<void> is_created;
@@ -65,7 +77,7 @@ int main() {
     ui::Surface surf(0,0,width,height);
 
     std::atomic<unsigned int> update_speed(400);
-    std::string Title = "Game of life, UPDATE SPEED: " + std::to_string(update_speed) + "ms";
+    std::string Title = "Game of life";
 
 
     ui::Surface playGround(0,0,700, height);
@@ -197,7 +209,7 @@ int main() {
 
 
     //setup game of life plane
-    cell_autom::Plane plane(70,60);
+    cell_autom::Plane plane(settings.width,settings.height);
 
 
     // setting up canvas
@@ -477,4 +489,36 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
         }
     }
     texture->display();
+}
+
+Settings get_settings(){
+    std::fstream file;
+    file.open(".//config.txt", std::fstream::in);
+    if(!file.is_open()){
+        file.open(".//config.txt",std::fstream::out|std::fstream::app);
+        if(!file.is_open()){
+            throw std::exception();
+            //"Could not open/create config file"
+        }
+        file.write(default_config, sizeof(default_config));
+        file.close();
+        return {70,60,""};
+    }
+    std::string data;
+    Settings settings = {0,0,""};
+    for(int i =0; i< 3; ++i) {
+        file >> data;
+        switch(data[0]) {
+            case 'W':
+                settings.width = atoi(data.c_str() + 2);
+                break;
+            case 'H':
+                settings.height = atoi(data.c_str() + 2);
+                break;
+            case 'R':
+                std::copy(data.begin() + 2, data.end(), settings.rule.begin());
+                break;
+        }
+    }
+    return settings;
 }

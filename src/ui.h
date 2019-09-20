@@ -63,7 +63,6 @@ namespace ui {
     protected:
         std::function<void()> updateHandle;
     };
-
     class Button:   public Item{
     public:
         template<typename ...T>
