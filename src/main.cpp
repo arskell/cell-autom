@@ -509,13 +509,13 @@ Settings get_settings(){
     for(int i =0; i< 3; ++i) {
         file >> data;
         switch(data[0]) {
-            case 'W':
+            case 'W': //Width
                 settings.width = atoi(data.c_str() + 2);
                 break;
-            case 'H':
+            case 'H': //Height
                 settings.height = atoi(data.c_str() + 2);
                 break;
-            case 'R':
+            case 'R': //Rule
                 std::copy(data.begin() + 2, data.end(), settings.rule.begin());
                 break;
         }
