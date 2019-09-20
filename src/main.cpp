@@ -50,7 +50,7 @@ struct Settings{
     std::string rule;
 };
 
-const char default_config[] = "W:70\nH:60\nR:\0";
+constexpr char default_config[] = "W:70\nH:60\nR:\0";
 Settings get_settings();
 
 int main() {
