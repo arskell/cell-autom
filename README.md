@@ -1,8 +1,10 @@
 # Cellular Automata
 
 (at this time only conway's game of life is available)  
-#### Required:  
-sfml  
+#### Required
+sfml
+
+###### Optional
 Catch2(for testing)  
 
 #### Compiling

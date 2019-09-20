@@ -1,3 +1,4 @@
+#include <cmath>
 #include <thread>
 #include <future>
 #include <mutex>
@@ -5,7 +6,6 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-
 
 #include <SFML/Graphics.hpp>
 
@@ -30,6 +30,11 @@ struct Render_settings{
     bool zoom_UPD;
 };
 
+//void debugPrint(const std::string& msg){
+//#ifdef DEBUG
+//    std::cout<<msg<<std::endl;
+//#endif
+//}
 
 void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
@@ -200,8 +205,15 @@ int main() {
     UIplane.element.setSize({0,0});
     auto playGround_Handler = [&](){
         auto cursor = wp.getCursorRelToWindow();
-        auto cursorXSc = render_settings.center.x - ceil((plane.getWidth()/2.0)*render_settings.zoomScale) + cursor.x/scale;
-        auto cursorYSc = render_settings.center.y - ceil((plane.getHeight()/2.0)*render_settings.zoomScale) + cursor.y/scale;
+        cell_autom::planeSize cursorXSc,cursorYSc;
+
+       if(render_settings.zoomScale==1){
+           cursorXSc = std::floor(cursor.x/scale);
+           cursorYSc = std::floor(cursor.y/scale);
+       }else{
+           cursorXSc = (render_settings.center.x - floor((plane.getWidth()/2.0f)*render_settings.zoomScale)) + floor(cursor.x/scale);
+           cursorYSc = (render_settings.center.y - floor((plane.getHeight()/2.0f)*render_settings.zoomScale)) + floor(cursor.y/scale);
+       }
         switch (cursor_setup.mode){
             case Cursor_setup::DRAW:
                 if(cursor_setup.cursorRadius > 0)
@@ -268,12 +280,12 @@ int main() {
     wp.setKeyEventHandler([&](sf::Event& ev){
         switch (ev.key.code){
             case sf::Keyboard::Key::Z:
-                render_settings.zoomScale *= 0.5;
+                render_settings.zoomScale *= 0.6;
                 render_settings.zoom_UPD = true;
                 break;
             case sf::Keyboard::Key::X:
-                if(render_settings.zoomScale < 1.0) {
-                    render_settings.zoomScale /= 0.5;
+                if(render_settings.zoomScale < 1) {
+                    render_settings.zoomScale /= 0.6;
                     render_settings.zoom_UPD = true;
                 }
                 break;
@@ -321,10 +333,10 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  float& scale,
                  Render_settings& render_settings){
 
-    auto planeRenderWidthStart = render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale;
-    auto planeRenderHeightStart = render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale;
-    auto planeRenderWidthEnd = render_settings.center.x + (plane.getWidth()/2.0)*render_settings.zoomScale;
-    auto planeRenderHeightEnd = render_settings.center.y + (plane.getHeight()/2.0)*render_settings.zoomScale;
+    auto planeRenderWidthStart = ceil(render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale);
+    auto planeRenderHeightStart = ceil(render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale);
+    auto planeRenderWidthEnd = ceil(render_settings.center.x + (plane.getWidth()/2.0)*render_settings.zoomScale);
+    auto planeRenderHeightEnd = ceil(render_settings.center.y + (plane.getHeight()/2.0)*render_settings.zoomScale);
 
     if(render_settings.zoom_UPD) {
         render_settings.zoom_UPD = false;
@@ -356,13 +368,14 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                 if (!in_bounds[3]) {
                     --render_settings.center.y;
                 }
-                planeRenderWidthStart = render_settings.center.x - (plane.getWidth() / 2.0) * render_settings.zoomScale;
+                planeRenderWidthStart = ceil(render_settings.center.x - (plane.getWidth() / 2.0) * render_settings.zoomScale);
                 planeRenderHeightStart =
-                        render_settings.center.y - (plane.getHeight() / 2.0) * render_settings.zoomScale;
-                planeRenderWidthEnd = render_settings.center.x + (plane.getWidth() / 2.0) * render_settings.zoomScale;
-                planeRenderHeightEnd = render_settings.center.y + (plane.getHeight() / 2.0) * render_settings.zoomScale;
+                        ceil(render_settings.center.y - (plane.getHeight() / 2.0) * render_settings.zoomScale);
+                planeRenderWidthEnd = ceil(render_settings.center.x + (plane.getWidth() / 2.0) * render_settings.zoomScale);
+                planeRenderHeightEnd = ceil(render_settings.center.y + (plane.getHeight() / 2.0) * render_settings.zoomScale);
             }
         }
+//        debugPrint();
     }
     auto tmp1 = static_cast<float>(windowHeight)/(planeRenderHeightEnd-planeRenderHeightStart);
     auto tmp2 = static_cast<float>(windowWidth)/(planeRenderWidthEnd-planeRenderWidthStart);
