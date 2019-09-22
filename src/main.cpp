@@ -63,7 +63,7 @@ int main() {
     //setup window manager
     std::promise<void> is_created;
     auto wind = std::async(std::launch::async, [&](){
-        wp.set_renderWindow(std::make_unique<sf::RenderWindow>(sf::VideoMode(width,height,8), "Game of life",
+        wp.set_renderWindow(std::make_unique<sf::RenderWindow>(sf::VideoMode(width,height,8), "Cellular automata",
                 sf::Style::Close | sf::Style::Titlebar));
         is_created.set_value();
         wp.update_events();
@@ -76,7 +76,7 @@ int main() {
     ui::Surface surf(0,0,width,height);
 
     std::atomic<unsigned int> update_speed(400);
-    std::string Title = "Game of life";
+    std::string Title = "Cellular automata";
 
 
     ui::Surface playGround(0,0,700, height);
@@ -253,7 +253,7 @@ int main() {
             plane_is_busy.unlock();
         }
         playGround.renderTexture.draw(sf::Sprite(planeTexture.getTexture()));
-        Title = "Game of life" + std::string((is_paused ? ", PAUSED" : ""));
+        Title =  "Cellular automata" + std::string((is_paused ? ", PAUSED" : "")) + ", Rule: "+settings.rule;
         wp.setWindowTitleSync(Title);
     });
 
@@ -324,7 +324,7 @@ int main() {
             old_zoom = render_settings.zoomScale;
         }
     });
-
+/*
     //temp
     bool reloaded = true;
 
@@ -337,13 +337,13 @@ int main() {
             reloaded = false;
         }
     });
-
+*/
     info_panel.addTextItem(&speed_txt);
     info_panel.addTextItem(&radius_txt);
     info_panel.addTextItem(&size_txt);
     info_panel.addTextItem(&mode_txt);
     info_panel.addTextItem(&zooming_txt);
-    info_panel.addTextItem(&rule_txt);
+   // info_panel.addTextItem(&rule_txt);
     //adding elements on the surface
     panel.addButton((&GRIDButton));
     panel.addButton(&SWITCHMODEButton);
