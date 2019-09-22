@@ -49,7 +49,7 @@ struct Settings{
     std::string rule;
 };
 
-constexpr char default_config[] = "W:70\nH:60\nR:R:S23/B3";
+constexpr char default_config[] = "W:70\nH:60\nR:S23/B3";
 Settings get_settings();
 
 int main() {
@@ -514,7 +514,7 @@ Settings get_settings(){
         }
         file.write(default_config, sizeof(default_config));
         file.close();
-        return {70,60,""};
+        return {70,60,"S23/B3"};
     }
     std::string data;
     Settings settings = {0,0,""};
