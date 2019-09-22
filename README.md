@@ -28,7 +28,7 @@ After first execution the application should create the config file. Edit it to 
 
 #### Rule
 
-In config file there is 'R' line. This Is it.  
+In the config file there is 'R' line. This Is it.  
 The rule should be written in S/B format. S - stands for "stay"(condition for stay alive), B - "born"(condition to became alive in the next generation).  
 For example, The game of life may be described like S23/B3 (order is not matter).  
   
