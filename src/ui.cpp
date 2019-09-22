@@ -3,11 +3,8 @@
 
 
 bool ui::UIElement::onPosition(posType cursorX, posType cursorY)const {
-    if((cursorX >= xPos && cursorX <= xPos+width)&&
-       (cursorY >= yPos && cursorY <= yPos+height)){
-        return true;
-    }
-    return false;
+    return (cursorX >= xPos && cursorX <= xPos + width) &&
+           (cursorY >= yPos && cursorY <= yPos + height);
 }
 
 void ui::Surface::updateContent(){

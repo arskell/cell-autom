@@ -10,7 +10,7 @@ TEST_CASE("plane test", "[plane]"){
     constexpr cell_autom::planeSize testW = 40;
     constexpr cell_autom::planeSize testH = 60;
 
-    cell_autom::Plane testPlane(testW, testH);
+    cell_autom::Plane testPlane(testW, testH, "S23/B3");
 
     SECTION("Check plane size"){
         REQUIRE(testPlane.getHeight() == testH);

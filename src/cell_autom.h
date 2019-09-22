@@ -23,7 +23,7 @@ namespace cell_autom {
 
     struct Plane{
 
-        Plane(planeSize width, planeSize height, std::string& rule):w(width),h(height){
+        Plane(planeSize width, planeSize height,const std::string& rule):w(width),h(height){
             _plane = new bool*[h];
             for(planeSize i = 0; i < h; ++i){
                 _plane[i] = new bool[w];
@@ -33,7 +33,7 @@ namespace cell_autom {
                 _planeBuffer[i] = new bool[w];
             }
             clear();
-            std::string::iterator offset = rule.begin();
+            std::string::const_iterator offset = rule.begin();
             for(int i = 0; i < std::count(rule.begin(), rule.end(), '/') + 1;++i){
                 switch (*(offset++)){
                     case 's':
@@ -55,9 +55,6 @@ namespace cell_autom {
                 }
                 ++offset;
             }
-            //to_born.push_back(3);
-            //to_stay.push_back(3);
-            //to_stay.push_back(2);
         }
 
         ~Plane(){
