@@ -100,11 +100,15 @@ int main() {
 
     ////////////////
 
+
+    //setup game of life plane
+    auto *plane = new cell_autom::Plane(settings.width,settings.height, settings.rule);
+
     // setting up UI
     //GRID BUTTON
     sf::Texture switchGridTexture;
     switchGridTexture.loadFromFile(".\\res\\switchGrid.bmp");
-    ui::Button GRIDButton(10,height-54-54,50,50);
+    ui::Button GRIDButton(25,height-54-54-24-11,50,50);
     GRIDButton.element.setTexture(&switchGridTexture);
     GRIDButton.element.setFillColor(sf::Color::Cyan);
     GRIDButton.setClickHandle([&](){
@@ -125,7 +129,7 @@ int main() {
     //UP BUTTON
     sf::Texture speedDownTexture;
     speedDownTexture.loadFromFile(".\\res\\speedDown.bmp");
-    ui::Button UPbutton(10,4,50,50);
+    ui::Button UPbutton(25,4,50,50);
     UPbutton.element.setTexture(&speedDownTexture);
     UPbutton.setClickHandle([&](){
         update_speed+=50;
@@ -145,7 +149,7 @@ int main() {
     //DOWN BUTTON
     sf::Texture speedUpTexture;
     speedUpTexture.loadFromFile(".\\res\\speedUp.bmp");
-    ui::Button DOWNbutton(10,4+50+4,50,50);
+    ui::Button DOWNbutton(25,4+50+4,50,50);
     DOWNbutton.element.setTexture(&speedUpTexture);
     DOWNbutton.setClickHandle([&](){
         if(update_speed != 0)update_speed-=50;
@@ -165,7 +169,7 @@ int main() {
     //PAUSE BUTTON
     sf::Texture stopTexture;
     stopTexture.loadFromFile(".\\res\\stop.bmp");
-    ui::Button PAUSEButton(10,4+50+4+50+4,50,50);
+    ui::Button PAUSEButton(25,4+50+4+50+4,50,50);
     PAUSEButton.element.setTexture(&stopTexture);
     PAUSEButton.setClickHandle([&](){
         is_paused = !is_paused;
@@ -181,11 +185,41 @@ int main() {
             PAUSEButton.element.setOutlineThickness(0.f);
         }
     });
+    // RELOAD CONFIG BUTTON
+
+    sf::Texture reloadTexture;
+    reloadTexture.loadFromFile(".\\res\\reload.bmp");
+    ui::Button RELOADButton(20,height-20-4,60,20);
+    RELOADButton.element.setTexture(&reloadTexture);
+    RELOADButton.setClickHandle([&](){
+        settings = get_settings();
+        plane_is_busy.lock();
+        delete plane;
+        plane = new cell_autom::Plane(settings.width,settings.height, settings.rule);
+        render_settings.center.x = plane->getWidth()/2;
+        render_settings.center.y = plane->getHeight()/2;
+        render_settings.zoomScale = 1;
+        render_settings.zoom_UPD = true;
+        plane_is_busy.unlock();
+    });
+
+    RELOADButton.element.setFillColor(sf::Color::White);
+    RELOADButton.setCursorOnItemHandle([&](){
+        RELOADButton.element.setOutlineThickness(3);
+    });
+    RELOADButton.setUpdateHandle([&](){
+        auto cursor = wp.getCursorRelToWindow();
+        if(!panel.relToPos(&RELOADButton, cursor.x, cursor.y) ){
+            RELOADButton.element.setOutlineThickness(0.f);
+        }
+    });
+
+
     //SWITCH CURSOR MODE BUTTON
 
     sf::Texture switchButton;
     switchButton.loadFromFile(".\\res\\switchMode.bmp");
-    ui::Button SWITCHMODEButton(10, height-54, 50,50);
+    ui::Button SWITCHMODEButton(25, height-54-24-11, 50,50);
     SWITCHMODEButton.element.setTexture(&switchButton);
     SWITCHMODEButton.setClickHandle([&](){
        if(cursor_setup.mode == Cursor_setup::DRAW){
@@ -207,10 +241,6 @@ int main() {
     });
 
 
-    //setup game of life plane
-    cell_autom::Plane plane(settings.width,settings.height, settings.rule);
-
-
     // setting up canvas
     ui::Button UIplane(0,0,700,height);
     UIplane.element.setSize({0,0});
@@ -222,21 +252,21 @@ int main() {
            cursorXSc = std::floor(cursor.x/scale);
            cursorYSc = std::floor(cursor.y/scale);
        }else{
-           cursorXSc = (render_settings.center.x - floor((plane.getWidth()/2.0f)*render_settings.zoomScale)) + floor(cursor.x/scale);
-           cursorYSc = (render_settings.center.y - floor((plane.getHeight()/2.0f)*render_settings.zoomScale)) + floor(cursor.y/scale);
+           cursorXSc = (render_settings.center.x - floor((plane->getWidth()/2.0f)*render_settings.zoomScale)) + floor(cursor.x/scale);
+           cursorYSc = (render_settings.center.y - floor((plane->getHeight()/2.0f)*render_settings.zoomScale)) + floor(cursor.y/scale);
        }
         switch (cursor_setup.mode){
             case Cursor_setup::DRAW:
                 if(cursor_setup.cursorRadius > 0)
-                    plane.fill({cursorXSc,cursorYSc}, cursor_setup.cursorRadius, LIVE_CELL);
+                    plane->fill({cursorXSc,cursorYSc}, cursor_setup.cursorRadius, LIVE_CELL);
                 else
-                    plane.setState({cursorXSc, cursorYSc},LIVE_CELL);
+                    plane->setState({cursorXSc, cursorYSc},LIVE_CELL);
                 break;
             case Cursor_setup::ERASE:
                 if(cursor_setup.cursorRadius > 0)
-                    plane.fill({cursorXSc, cursorYSc}, cursor_setup.cursorRadius, DEAD_CELL);
+                    plane->fill({cursorXSc, cursorYSc}, cursor_setup.cursorRadius, DEAD_CELL);
                 else
-                    plane.setState({cursorXSc, cursorYSc},DEAD_CELL);
+                    plane->setState({cursorXSc, cursorYSc},DEAD_CELL);
                 break;
             default:
                 break;
@@ -248,7 +278,7 @@ int main() {
 
     UIplane.setUpdateHandle([&](){
         if(plane_is_busy.try_lock()){
-            renderPlane(plane, &planeTexture, playGround.getWHSize().first ,
+            renderPlane(*plane, &planeTexture, playGround.getWHSize().first ,
                         playGround.getWHSize().second,scale,render_settings);
             plane_is_busy.unlock();
         }
@@ -297,10 +327,10 @@ int main() {
 
     ui::Text size_txt(0,30,0,11);
     size_txt.text.setFont(fnt);
-    size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
-   // size_txt.setUpdateHandle([&](){
-   //     size_txt.text.setString("size: " + std::to_string(plane.getWidth()) + "X" + std::to_string(plane.getHeight()));
-   // });
+    size_txt.text.setString("size: " + std::to_string(plane->getWidth()) + "X" + std::to_string(plane->getHeight()));
+    size_txt.setUpdateHandle([&](){
+        size_txt.text.setString("size: " + std::to_string(plane->getWidth()) + "X" + std::to_string(plane->getHeight()));
+    });
 
     ui::Text mode_txt(0,45,0,11);
     mode_txt.text.setFont(fnt);
@@ -345,7 +375,8 @@ int main() {
     info_panel.addTextItem(&zooming_txt);
    // info_panel.addTextItem(&rule_txt);
     //adding elements on the surface
-    panel.addButton((&GRIDButton));
+    panel.addButton(&RELOADButton);
+    panel.addButton(&GRIDButton);
     panel.addButton(&SWITCHMODEButton);
     panel.addButton(&PAUSEButton);
     panel.addButton(&DOWNbutton);
@@ -356,8 +387,8 @@ int main() {
     surf.addSurf(&playGround);
 
     //setup render settings
-    render_settings.center.x = plane.getWidth()/2;
-    render_settings.center.y = plane.getHeight()/2;
+    render_settings.center.x = plane->getWidth()/2;
+    render_settings.center.y = plane->getHeight()/2;
     render_settings.zoomScale = 1;
     render_settings.zoom_UPD = true;
     //setup keys
@@ -374,19 +405,19 @@ int main() {
                 }
                 break;
             case sf::Keyboard::Key::Up:
-                if(render_settings.center.y - (plane.getHeight()/2.0)*render_settings.zoomScale > 0)
+                if(render_settings.center.y - (plane->getHeight()/2.0)*render_settings.zoomScale > 0)
                     --render_settings.center.y;
                 break;
             case sf::Keyboard::Key::Down:
-                if(render_settings.center.y + (plane.getHeight()/2.0)*render_settings.zoomScale < plane.getHeight() - 1)
+                if(render_settings.center.y + (plane->getHeight()/2.0)*render_settings.zoomScale < plane->getHeight() - 1)
                     ++render_settings.center.y;
                 break;
             case sf::Keyboard::Key::Right:
-                if(render_settings.center.x + (plane.getWidth()/2.0)*render_settings.zoomScale < plane.getWidth() - 1)
+                if(render_settings.center.x + (plane->getWidth()/2.0)*render_settings.zoomScale < plane->getWidth() - 1)
                     ++render_settings.center.x;
                 break;
             case sf::Keyboard::Key::Left:
-                if(render_settings.center.x - (plane.getWidth()/2.0)*render_settings.zoomScale > 0)
+                if(render_settings.center.x - (plane->getWidth()/2.0)*render_settings.zoomScale > 0)
                     --render_settings.center.x;
                 break;
             default:
@@ -402,7 +433,7 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(update_speed) );
         if(!is_paused) {
             plane_is_busy.lock();
-            plane.nextStep();
+            plane->nextStep();
             plane_is_busy.unlock();
         }
     }
