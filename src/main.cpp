@@ -533,5 +533,6 @@ Settings get_settings(){
                 break;
         }
     }
+    file.close();
     return settings;
 }
