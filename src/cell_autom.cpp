@@ -30,14 +30,18 @@ void cell_autom::Plane::nextStep() {
             auto live_cells_near = liveCellsNear({w_pos,h_pos});
             auto cell_state = _plane[h_pos][w_pos];
 
-            if(live_cells_near < 2 && (cell_state == LIVE_CELL)){
-                _planeBuffer[h_pos][w_pos] = DEAD_CELL;
-            }else if(live_cells_near > 3 && (cell_state==LIVE_CELL)){
-                _planeBuffer[h_pos][w_pos] = DEAD_CELL;
-            }else if((live_cells_near == 3) && (cell_state == DEAD_CELL)){
-                _planeBuffer[h_pos][w_pos] = LIVE_CELL;
+            if(cell_state == DEAD_CELL) {
+                if (std::find(to_born.begin(), to_born.end(), live_cells_near) != to_born.end()) {
+                    _planeBuffer[h_pos][w_pos] = LIVE_CELL;
+                }else{
+                    _planeBuffer[h_pos][w_pos] = DEAD_CELL;
+                }
             }else{
-                _planeBuffer[h_pos][w_pos] = cell_state;
+                if (std::find(to_stay.begin(), to_stay.end(), live_cells_near) != to_stay.end()) {
+                    _planeBuffer[h_pos][w_pos] = LIVE_CELL;
+                }else{
+                    _planeBuffer[h_pos][w_pos] = DEAD_CELL;
+                }
             }
         }
     }

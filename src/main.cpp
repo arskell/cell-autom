@@ -5,7 +5,6 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <cmath>
 #include <exception>
 #include <fstream>
 
@@ -50,7 +49,7 @@ struct Settings{
     std::string rule;
 };
 
-constexpr char default_config[] = "W:70\nH:60\nR:\0";
+constexpr char default_config[] = "W:70\nH:60\nR:R:S23/B3";
 Settings get_settings();
 
 int main() {
@@ -209,7 +208,7 @@ int main() {
 
 
     //setup game of life plane
-    cell_autom::Plane plane(settings.width,settings.height);
+    cell_autom::Plane plane(settings.width,settings.height, settings.rule);
 
 
     // setting up canvas
@@ -326,12 +325,25 @@ int main() {
         }
     });
 
+    //temp
+    bool reloaded = true;
+
+    ui::Text rule_txt(0,75,0,11);
+    rule_txt.text.setFont(fnt);
+    rule_txt.text.setString("rule: ");
+    rule_txt.setUpdateHandle([&](){
+        if(reloaded) {
+            rule_txt.text.setString("rule: " + settings.rule);
+            reloaded = false;
+        }
+    });
+
     info_panel.addTextItem(&speed_txt);
     info_panel.addTextItem(&radius_txt);
     info_panel.addTextItem(&size_txt);
     info_panel.addTextItem(&mode_txt);
     info_panel.addTextItem(&zooming_txt);
-
+    info_panel.addTextItem(&rule_txt);
     //adding elements on the surface
     panel.addButton((&GRIDButton));
     panel.addButton(&SWITCHMODEButton);
@@ -516,6 +528,7 @@ Settings get_settings(){
                 settings.height = atoi(data.c_str() + 2);
                 break;
             case 'R': //Rule
+                settings.rule.resize(data.size()-2);
                 std::copy(data.begin() + 2, data.end(), settings.rule.begin());
                 break;
         }

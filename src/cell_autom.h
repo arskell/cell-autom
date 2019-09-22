@@ -4,7 +4,10 @@
 
 #include <cstdint>
 #include <vector>
+#include <cstdlib>
 #include <mutex>
+#include <string>
+#include <algorithm>
 #define LIVE_CELL true
 #define DEAD_CELL false
 
@@ -20,7 +23,7 @@ namespace cell_autom {
 
     struct Plane{
 
-        Plane(planeSize width, planeSize height):w(width),h(height){
+        Plane(planeSize width, planeSize height, std::string& rule):w(width),h(height){
             _plane = new bool*[h];
             for(planeSize i = 0; i < h; ++i){
                 _plane[i] = new bool[w];
@@ -29,8 +32,32 @@ namespace cell_autom {
             for(planeSize i = 0; i < h; ++i){
                 _planeBuffer[i] = new bool[w];
             }
-
             clear();
+            std::string::iterator offset = rule.begin();
+            for(int i = 0; i < std::count(rule.begin(), rule.end(), '/') + 1;++i){
+                switch (*(offset++)){
+                    case 's':
+                    case 'S':
+                        while(*offset!='/' && *offset!='\0'){
+                            to_stay.push_back(*offset - 48);
+                            ++offset;
+                        }
+                        break;
+                    case 'b':
+                    case 'B':
+                        while(*offset!='/' && *offset!='\0'){
+                            to_born.push_back(*offset - 48);
+                            ++offset;
+                        }
+                        break;
+                    default:
+                        offset = std::find(offset, rule.end(), '/') ;
+                }
+                ++offset;
+            }
+            //to_born.push_back(3);
+            //to_stay.push_back(3);
+            //to_stay.push_back(2);
         }
 
         ~Plane(){
@@ -60,6 +87,8 @@ namespace cell_autom {
         uint8_t liveCellsNear(Point<planeSize> point);
         bool checkRange(Point<planeSize> point);
         std::mutex bufferOwner;
+        std::vector<int> to_born;
+        std::vector<int> to_stay;
     };
 
 }
