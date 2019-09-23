@@ -22,12 +22,6 @@ TEST_CASE("plane test", "[plane]"){
         REQUIRE( (testPlane[{testW-1,testH-1}]  == DEAD_CELL) );
     }
 
-    SECTION("Invert cell state"){
-        testPlane.invert({5,10});
-        REQUIRE( testPlane[{5,10}]  == LIVE_CELL);
-        testPlane.invert({5,10});
-        REQUIRE( testPlane[{5,10}]  == DEAD_CELL);
-    }
     SECTION("Set a state"){
         testPlane.setState({7,11}, LIVE_CELL);
         REQUIRE( testPlane[{7,11}]  == LIVE_CELL);
@@ -57,7 +51,7 @@ TEST_CASE("plane test", "[plane]"){
         p[1] = {0,1};               p[5] = {2,1};
         p[2] = {0,2}; p[3] = {1,2}; p[4] = {2,2};
         for(auto& e:p){
-            testPlane.invert(e);
+            testPlane.setState(e, LIVE_CELL);
         }
         REQUIRE(testPlane.liveCellsNear({1,1}) == 8);
     }
@@ -66,7 +60,7 @@ TEST_CASE("plane test", "[plane]"){
         p[1] = {4,5};
         p[2] = {10,20};
         for(int i = 0; i < 3; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         REQUIRE(testPlane.liveCellsNear({5,5}) == 2);
     }
@@ -76,13 +70,13 @@ TEST_CASE("plane test", "[plane]"){
         p[2] = {1,15};
         p[3] = {0,0};
         for(int i = 0; i < 4; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         REQUIRE(testPlane.liveCellsNear({0,14}) == 3);
     }
     SECTION("Detect zero points"){
         p[0] = {4,4};
-        testPlane.invert(p[0]);
+        testPlane.setState(p[0],LIVE_CELL);
         REQUIRE(testPlane.liveCellsNear({24,30}) == 0);
     }
 
@@ -90,7 +84,7 @@ TEST_CASE("plane test", "[plane]"){
         p[0] = {4,4};
         p[1] = {5,5};
         for(int i = 0; i < 2; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         testPlane.nextStep();
         REQUIRE(testPlane[p[0]] == DEAD_CELL);
@@ -103,7 +97,7 @@ TEST_CASE("plane test", "[plane]"){
         p[1] = {10,11};
         p[2] = {11,11};
         for(int i = 0; i < 3; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         testPlane.nextStep();
         REQUIRE(testPlane[p[0]] == LIVE_CELL);
@@ -118,7 +112,7 @@ TEST_CASE("plane test", "[plane]"){
         p[3] = {11,10};
         p[4] = {11, 9};
         for(int i = 0; i < 5; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         testPlane.nextStep();
         REQUIRE(testPlane[p[0]] == DEAD_CELL);
@@ -132,7 +126,7 @@ TEST_CASE("plane test", "[plane]"){
         p[2] = {11,11};
         p[3] = {11, 9};
         for(int i = 0; i < 4; ++i){
-            testPlane.invert(p[i]);
+            testPlane.setState(p[i], LIVE_CELL);
         }
         testPlane.nextStep();
         REQUIRE(testPlane[{12, 10}] == LIVE_CELL);

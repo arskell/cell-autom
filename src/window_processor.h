@@ -42,7 +42,6 @@ public:
     void update(const sf::Sprite& sprt);
     void update_events();
     void setKeyEventHandler(std::function<void(sf::Event&)>&& _fnc);
-    void closeWindow();
     auto getCursorRelToWindow() const{
         return sf::Mouse::getPosition(*renderWindow);
     }

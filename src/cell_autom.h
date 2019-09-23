@@ -67,7 +67,6 @@ namespace cell_autom {
         }
 
         void nextStep();
-        void invert(Point<planeSize> p);
         void setState(Point<planeSize> p, bool state);
         void clear();
         bool operator[](Point<planeSize> p) const;

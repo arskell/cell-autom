@@ -10,7 +10,6 @@
 
 #include <SFML/Graphics.hpp>
 
-
 #include "window_processor.h"
 #include "cell_autom.h"
 
@@ -30,12 +29,6 @@ struct Render_settings{
     float zoomScale;
     bool zoom_UPD;
 };
-
-//void debugPrint(const std::string& msg){
-//#ifdef DEBUG
-//    std::cout<<msg<<std::endl;
-//#endif
-//}
 
 void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                  unsigned int windowWidth,
@@ -69,7 +62,6 @@ int main() {
         wp.update_events();
     });
 
-
     sf::RenderTexture planeTexture;
 
     planeTexture.create(width-100,height);
@@ -78,12 +70,10 @@ int main() {
     std::atomic<unsigned int> update_speed(400);
     std::string Title = "Cellular automata";
 
-
     ui::Surface playGround(0,0,700, height);
     ui::Surface panel(700,0,100,height);
 
     bool is_paused(false);
-
     ////////////////
     //initializing data structures
     std::mutex plane_is_busy;
@@ -93,13 +83,11 @@ int main() {
     cursor_setup.mode = Cursor_setup::DRAW;
     cursor_setup.cursorRadius = 0;
 
-
     //setup render settings
     Render_settings render_settings;
     render_settings.grid = true;
 
     ////////////////
-
 
     //setup game of life plane
     auto *plane = new cell_autom::Plane(settings.width,settings.height, settings.rule);
@@ -214,7 +202,6 @@ int main() {
         }
     });
 
-
     //SWITCH CURSOR MODE BUTTON
 
     sf::Texture switchButton;
@@ -239,7 +226,6 @@ int main() {
             SWITCHMODEButton.element.setOutlineThickness(0.f);
         }
     });
-
 
     // setting up canvas
     ui::Button UIplane(0,0,700,height);
@@ -300,7 +286,6 @@ int main() {
     fnt.loadFromFile(".\\res\\ArialRegular.ttf");
     //adding text
 
-
     ui::Surface info_panel(4,200,100,150);
     ui::Text speed_txt(0,0,0,11);
     speed_txt.text.setFont(fnt);
@@ -354,26 +339,49 @@ int main() {
             old_zoom = render_settings.zoomScale;
         }
     });
-/*
-    //temp
-    bool reloaded = true;
 
-    ui::Text rule_txt(0,75,0,11);
-    rule_txt.text.setFont(fnt);
-    rule_txt.text.setString("rule: ");
-    rule_txt.setUpdateHandle([&](){
-        if(reloaded) {
-            rule_txt.text.setString("rule: " + settings.rule);
-            reloaded = false;
+    ui::Text x_axis_txt(0,75,0,11);
+    x_axis_txt.text.setFont(fnt);
+    x_axis_txt.text.setString("X: ");
+    x_axis_txt.setUpdateHandle([&](){
+        auto cursor = wp.getCursorRelToWindow();
+        if(playGround.onPosition(cursor.x,cursor.y)) {
+            cell_autom::planeSize cursorXSc;
+            if (render_settings.zoomScale == 1) {
+                cursorXSc = std::floor(cursor.x / scale);
+            } else {
+                cursorXSc = (render_settings.center.x - floor((plane->getWidth() / 2.0f) * render_settings.zoomScale)) +
+                            floor(cursor.x / scale);
+            }
+            x_axis_txt.text.setString("X: " + std::to_string(cursorXSc));
         }
     });
-*/
+
+    ui::Text y_axis_txt(0,90,0,11);
+    y_axis_txt.text.setFont(fnt);
+    y_axis_txt.text.setString("Y: ");
+    y_axis_txt.setUpdateHandle([&](){
+        auto cursor = wp.getCursorRelToWindow();
+        if(playGround.onPosition(cursor.x,cursor.y)) {
+            cell_autom::planeSize cursorYSc;
+            if (render_settings.zoomScale == 1) {
+                cursorYSc = std::floor(cursor.y / scale);
+            } else {
+                cursorYSc =
+                        (render_settings.center.y - floor((plane->getHeight() / 2.0f) * render_settings.zoomScale)) +
+                        floor(cursor.y / scale);
+            }
+            y_axis_txt.text.setString("Y: " + std::to_string(cursorYSc));
+        }
+    });
+
     info_panel.addTextItem(&speed_txt);
     info_panel.addTextItem(&radius_txt);
     info_panel.addTextItem(&size_txt);
     info_panel.addTextItem(&mode_txt);
     info_panel.addTextItem(&zooming_txt);
-   // info_panel.addTextItem(&rule_txt);
+    info_panel.addTextItem(&x_axis_txt);
+    info_panel.addTextItem(&y_axis_txt);
     //adding elements on the surface
     panel.addButton(&RELOADButton);
     panel.addButton(&GRIDButton);
@@ -437,7 +445,6 @@ int main() {
             plane_is_busy.unlock();
         }
     }
-
     wind.wait();
     return 0;
 }
@@ -490,7 +497,6 @@ void renderPlane(const cell_autom::Plane& plane,sf::RenderTexture* texture,
                 planeRenderHeightEnd = ceil(render_settings.center.y + (plane.getHeight() / 2.0) * render_settings.zoomScale);
             }
         }
-//        debugPrint();
     }
     auto tmp1 = static_cast<float>(windowHeight)/(planeRenderHeightEnd-planeRenderHeightStart);
     auto tmp2 = static_cast<float>(windowWidth)/(planeRenderWidthEnd-planeRenderWidthStart);

@@ -4,10 +4,6 @@ bool cell_autom::Plane::operator[](Point<planeSize> p) const {
     return _plane[p.y][p.x];
 }
 
-void cell_autom::Plane::invert(Point<planeSize> p) {
-    _plane[p.y][p.x] = !_plane[p.y][p.x];
-}
-
 void cell_autom::Plane::clear() {
     for(planeSize i = 0; i < h; ++i){
         for(planeSize j = 0; j < w; ++j){
@@ -85,8 +81,7 @@ uint8_t cell_autom::Plane::liveCellsNear(Point<planeSize> point) {
 
 bool cell_autom::Plane::checkRange(Point<planeSize> point) {
     if( (point.x < 0)|| (point.x >= w)) return false;
-    if( (point.y < 0)|| (point.y >= h)) return false;
-    return true;
+    return !((point.y < 0) || (point.y >= h));
 }
 
 void cell_autom::Plane::fill(cell_autom::Point<planeSize> center, uint8_t size, bool state) {

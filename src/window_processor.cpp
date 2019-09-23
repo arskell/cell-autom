@@ -65,16 +65,6 @@ void Window_processor::setKeyEventHandler(std::function<void(sf::Event &)>&& _fn
     keyEventHandler = std::forward<decltype(_fnc)>(_fnc);
 }
 
-/* unstable
- *
- * TO REMOVE*/
-void Window_processor::closeWindow() {
-    //std::lock_guard<std::mutex> lc(mtx);
-    //renderWindow->setActive(true);
-    renderWindow->close();
-    //renderWindow->setActive(false);
-}
-
 void Window_processor::update(const sf::Sprite& sprt){
     std::lock_guard<std::mutex> lc(mtx);
     renderbuffer.draw(sprt);
