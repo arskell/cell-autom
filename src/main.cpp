@@ -20,7 +20,7 @@ struct Cursor_setup{
         DRAW,
         ERASE
     }mode;
-    unsigned int cursorRadius;
+    unsigned char cursorRadius;
 };
 
 struct Render_settings{
