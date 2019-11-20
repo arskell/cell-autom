@@ -403,14 +403,16 @@ int main() {
     wp.setKeyEventHandler([&](sf::Event& ev){
         switch (ev.key.code){
             case sf::Keyboard::Key::Z:
+                if(render_settings.zoomScale <  1e-5) break;
                 render_settings.zoomScale *= 0.6;
                 render_settings.zoom_UPD = true;
                 break;
             case sf::Keyboard::Key::X:
-                if(render_settings.zoomScale < 1) {
-                    render_settings.zoomScale /= 0.6;
-                    render_settings.zoom_UPD = true;
+                render_settings.zoomScale /= 0.6;
+                if(render_settings.zoomScale > 1.0){
+                    render_settings.zoomScale = 1.0;
                 }
+                render_settings.zoom_UPD = true;
                 break;
             case sf::Keyboard::Key::Up:
                 if(render_settings.center.y - (plane->getHeight()/2.0)*render_settings.zoomScale > 0)
